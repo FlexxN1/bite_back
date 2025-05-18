@@ -15,8 +15,8 @@
 
 body {
   background: #d6de45;
-    background: #ebf266;
-    background: linear-gradient(90deg, rgba(235, 242, 102, 1) 0%, rgba(8, 130, 59, 1) 100%, rgba(237, 221, 83, 1) 100%);
+  background: #ebf266;
+  background: linear-gradient(90deg, rgba(235, 242, 102, 1) 0%, rgba(8, 130, 59, 1) 100%, rgba(237, 221, 83, 1) 100%);
   color: var(--beige-fondo);
   font-family: "Rubik", sans-serif;
 }
