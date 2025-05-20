@@ -1,0 +1,15 @@
+{
+  "name": "bite_back",
+  "version": "1.0.0",
+  "description": "Es una SPA construida en React.js con el objetivo de simular una tienda virtual de comercio.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "ecmascript"
+  ],
+  "author": "Juan David, Yeison, Kritel, Bryam, Junior",
+  "license": "MIT"
+}
