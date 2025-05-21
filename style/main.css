@@ -135,6 +135,7 @@ section {
   display: flex;
   justify-content: center;
 }
+<<<<<<< HEAD
 
 /* Tarjeta de producto */
 .card_shadow {
@@ -150,6 +151,67 @@ section {
   background-color: transparent;
   text-align: left;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+=======
+./* hola soy kris y estoy aprendiendo css*/
+.section__info--main {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px;
+  background: linear-gradient(to right, #a8e063, #56ab2f); /* Verde claro a oscuro */
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+
+.section__main--info {
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+
+.section__main--info h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #f5eeee;
+}
+
+
+.section__main--info p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  color: #f0f0f0;
+}
+
+/* Botón */
+.section__main--info .btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  color: #56ab2f;
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.section__main--info .btn:hover {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+header h1, .nav-link {
+  color: var(--beige-fondo);
+>>>>>>> 4bdb0c4 (section mainInfo)
 }
 
 .card_shadow:hover {
