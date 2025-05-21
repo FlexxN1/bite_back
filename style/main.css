@@ -248,7 +248,7 @@ section {
   color: var(--negro-suave);
   border: 1px solid var(--verde-claro);
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 10px;
   width: 100%;
   margin-bottom: 15px;
 }
@@ -278,9 +278,9 @@ textarea.form-control {
 }
 
 .btn-outline-danger {
-  background-color: transparent;
-  border: 2px solid var(--naranja);
-  color: var(--naranja);
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  color: black;
 }
 
 .btn-outline-danger:hover {
