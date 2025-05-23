@@ -158,6 +158,11 @@ section {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
+.card_shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
 .logo-container {
   width: 100%;
   height: auto;
@@ -274,9 +279,9 @@ textarea.form-control {
 }
 
 .btn-outline-danger {
-  background-color: transparent;
-  border: 2px solid var(--naranja);
-  color: var(--naranja);
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  color: black;
 }
 
 .btn-outline-danger:hover {
