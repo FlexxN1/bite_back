@@ -289,15 +289,15 @@ textarea.form-control {
   color: var(--blanco);
 }
 /* ====== INICIO FOOTER ====== */
-footer {
-  background-color: var(--negro-suave);
-  color: var(--beige-fondo);
-  padding: 20px 15px;
+#footer {
+  background-color: #4E5B30;
+  padding: 1rem;;
   text-align: center;
 }
 
-footer small {
-  font-size: 0.9rem;
+#footer small {
+  color: #FFF4A4;
+  font-size: 0.875rem;
 }
 /* ====== FIN FOOTER ====== */
 
