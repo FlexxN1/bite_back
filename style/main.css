@@ -288,7 +288,7 @@ textarea.form-control {
   background-color: var(--naranja);
   color: var(--blanco);
 }
-
+/* ====== INICIO FOOTER ====== */
 footer {
   background-color: var(--negro-suave);
   color: var(--beige-fondo);
@@ -299,7 +299,7 @@ footer {
 footer small {
   font-size: 0.9rem;
 }
-
+/* ====== FIN FOOTER ====== */
 
 @media (max-width: 768px) {
   .container__header {
