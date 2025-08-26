@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../style/main.css" />
+    <title>Registro</title>
+</head>
+<body>
+
+<!-- Contenedor principal -->
+<section class="form-container">
+    <!-- Logo y título -->
+    <div class="form-header">
+        <img src="../assets/logo.png" alt="BiteBack Logo" class="form-logo">
+        <h2>Registro de Usuario</h2>
+    </div>
+
+    <!-- Formulario -->
+    <form id="formRegistro">
+        <input type="text" id="Nombre" placeholder="Nombre completo" required />
+        <input type="email" id="Correo" placeholder="Correo electrónico" required />
+        <input type="password" id="password" placeholder="Contraseña" required />
+        <input type="password" id="Confirmar" placeholder="Confirmar Contraseña" required />
+        <select id="tipoUsuario" required>
+            <option value="">Selecciona tipo de Usuario</option>
+            <option value="Usuario">Usuario</option>
+            <option value="Administrador">Administrador</option>
+        </select>
+        <button type="submit">Registrarse</button>
+    </form>
+
+    <!-- Enlaces -->
+    <p>
+        <a href="login.html" class="btn-primary">Iniciar sesión</a>
+    </p>
+    <p>
+        <a href="../index.html" class="btn-secondary">Volver</a>
+    </p>
+
+</section>
+
+<script src="../src/auth.js"></script>
+</body>
+</html>
