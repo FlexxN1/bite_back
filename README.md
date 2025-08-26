@@ -1,36 +1,35 @@
-# Bite Back 🛒🛍
+# BiteBack
 
-Es una SPA construida en React.js con el objetivo de simular una tienda virtual de comercio.
+Aplicación web desarrollada en React con Vite.  
+Incluye un backend en Node.js para la gestión de usuarios y consumo de la API pública FakeStore.
 
-Recursos :
+## Instalación
 
-- [API-FakeStore](https://fakestoreapi.com/)
-
-- [Figma Mobile Design](https://www.figma.com/proto/bcEVujIzJj5PNIWwF9pP2w/Platzi_YardSale?node-id=0%3A719&amp%3Bscaling=scale-down&amp%3Bpage-id=0%3A1&amp%3Bstarting-point-node-id=0%3A719)
-
-- [Figma Desktop Design](https://www.figma.com/proto/bcEVujIzJj5PNIWwF9pP2w/Platzi_YardSale?node-id=5%3A2808[%E2%80%A6]ing=scale-down&amp;page-id=0%3A998&amp;starting-point-node-id=5%3A2808)
-
-## View project 🚀🙋🏻‍♂️
-## [Deploy](https://flexx-e-commerce.netlify.app/)
-
-## Installation ⚖
-Clone yardsales:
-```
-git clone https://github.com/FlexxN1/YardSale-i-Commerce.git
- ```
-
-Install dependencies:
-```
+```bash
 npm install
 ```
 
-Local yardsales deploy:
+## Ejecución
+
+1. Iniciar la API local de usuarios:
+```bash
+npm run start-api
 ```
-npm run start
+
+2. Iniciar el frontend:
+```bash
+npm run dev
 ```
 
-## License 🔐
+Abrir en el navegador: [http://localhost:5173](http://localhost:5173)
 
-Copyright © 2022 [Juan David Moreno](https://github.com/FlexxN1)
+## Scripts disponibles
 
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed
+- `npm run dev` → Ejecuta la aplicación en modo desarrollo  
+- `npm run build` → Construye la aplicación para producción  
+- `npm run preview` → Previsualiza la build de producción  
+- `npm run start-api` → Levanta la API local de usuarios
+
+## Licencia
+
+MIT License
