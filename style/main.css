@@ -158,6 +158,11 @@ section {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
+.card_shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
 .logo-container {
   width: 100%;
   height: auto;
@@ -244,7 +249,7 @@ section {
   color: var(--negro-suave);
   border: 1px solid var(--verde-claro);
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 10px;
   width: 100%;
   margin-bottom: 15px;
 }
@@ -274,27 +279,27 @@ textarea.form-control {
 }
 
 .btn-outline-danger {
-  background-color: transparent;
-  border: 2px solid var(--naranja);
-  color: var(--naranja);
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  color: black;
 }
 
 .btn-outline-danger:hover {
   background-color: var(--naranja);
   color: var(--blanco);
 }
-
-footer {
-  background-color: var(--negro-suave);
-  color: var(--beige-fondo);
-  padding: 20px 15px;
+/* ====== INICIO FOOTER ====== */
+#footer {
+  background-color: #4E5B30;
+  padding: 1rem;;
   text-align: center;
 }
 
-footer small {
-  font-size: 0.9rem;
+#footer small {
+  color: #FFF4A4;
+  font-size: 0.875rem;
 }
-
+/* ====== FIN FOOTER ====== */
 
 @media (max-width: 768px) {
   .container__header {
