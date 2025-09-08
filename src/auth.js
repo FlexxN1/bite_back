@@ -1,186 +1,185 @@
-// auth.js — BiteBack (mejorado)
+// auth.js — BiteBack (API-integrado)
+// Mantiene la UX existente, pero ahora consume la API local (ver server/server.js).
+// Fallback: si la API no responde, recurre a localStorage como antes.
 
-// ===== Helpers de DOM y rutas =====
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : '';
+
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const pageName = () => (location.pathname.split("/").pop() || "index.html").toLowerCase();
+const pageName = () => (location.pathname.split('/').pop() || 'index.html').toLowerCase();
 const go = (url) => (location.href = url);
 
-// ===== Persistencia coherente =====
-const STORAGE_KEY = "usuarioActual";
-
-const getUser = () => {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null;
-    } catch { return null; }
-};
+// Persistencia en localStorage (fallback/estado de sesión)
+const STORAGE_KEY = 'usuarioActual';
+const getUser = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; } };
 const setUser = (u) => localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
 const clearUser = () => localStorage.removeItem(STORAGE_KEY);
+const isLoggedIn = () => !!(getUser()?.token);
 
-const isLoggedIn = () => {
-    const u = getUser();
-    return !!(u && u.sesionIniciada);
-};
+// --------- Cliente API ---------
+async function apiFetch(path, { method = 'GET', body, token } = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = data?.message || `Error HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
 
-// ===== Guardas de navegación =====
-// Páginas que NO requieren sesión: login, registro, index (el resto sí)
-const PUBLIC_PAGES = new Set(["login.html", "registro.html", "index.html", ""]);
+// --------- UI pequeñas ---------
+function updateHeaderLinks() {
+  // Muestra/oculta enlaces según sesión
+  const login = $('#loginLink');
+  const reg = $('#registroLink');
+  const perfil = $('#perfilLink');
+  const has = isLoggedIn();
+  if (login)  login.style.display = has ? 'none' : '';
+  if (reg)    reg.style.display = has ? 'none' : '';
+  if (perfil) perfil.style.display = has ? '' : 'none';
+}
+function setGreeting() {
+  const u = getUser();
+  const saludo = $('#saludoUsuario');
+  if (saludo && u?.user?.name) saludo.textContent = `Hola, ${u.user.name}`;
+}
 
-// Redirige si intenta ver página privada sin sesión
-const protectRoute = () => {
-    const p = pageName();
-    if (!PUBLIC_PAGES.has(p) && !isLoggedIn()) {
-        go("login.html");
+// --------- Registro ---------
+function mountRegister() {
+  const form = $('#registroForm') || $('#formRegistro');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = (form.nombre?.value ?? $('#Nombre')?.value ?? '').trim();
+    const email  = (form.correo?.value ?? $('#Correo')?.value ?? '').trim();
+    const pass   = (form.password?.value ?? $('#password')?.value ?? '');
+    const conf   = (form.confirmar?.value ?? $('#Confirmar')?.value ?? '');
+    const tipo   = (document.querySelector('input[name="tipoUsuario"]:checked')?.value
+                    ?? $('#tipoUsuario')?.value ?? '');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!nombre || !email || !pass) return alert('Todos los campos son obligatorios.');
+    if (!emailRegex.test(email)) return alert('Correo electrónico no válido.');
+    if (pass.length < 6) return alert('La contraseña debe tener al menos 6 caracteres.');
+    if (pass !== conf) return alert('Las contraseñas no coinciden.');
+    if (!tipo) return alert('Selecciona tu tipo de usuario.');
+
+    try {
+      const resp = await apiFetch('/api/auth/register', {
+        method: 'POST',
+        body: { name: nombre, email, password: pass }
+      });
+      // Guardamos token+user para la sesión
+      setUser({ token: resp.data.token, user: resp.data.user, tipo });
+      alert('Registro exitoso.');
+      go('login.html'); // o redirigir directo a perfil
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error registrando usuario');
     }
-};
+  });
+}
 
-// Si ya está logueado, evita mostrar login/registro
-const avoidAuthWhenLogged = () => {
-    const p = pageName();
-    if (isLoggedIn() && (p === "login.html" || p === "registro.html")) {
-        go("perfil.html");
+// --------- Login ---------
+function mountLogin() {
+  const form = $('#loginForm') || $('#formLogin');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (form.email?.value ?? $('#Correo')?.value ?? $('#correoLogin')?.value ?? '').trim();
+    const pass = (form.password?.value ?? $('#password')?.value ?? $('#passwordLogin')?.value ?? '');
+
+    try {
+      const resp = await apiFetch('/api/auth/login', {
+        method: 'POST',
+        body: { email, password: pass }
+      });
+      setUser({ token: resp.data.token, user: resp.data.user });
+      alert('Inicio de sesión exitoso.');
+      go('perfil.html');
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Credenciales incorrectas');
     }
-};
+  });
+}
 
-// ===== UI pequeñas =====
-const setGreeting = () => {
-    const u = getUser();
-    const saludo = $("#saludoUsuario");
-    if (saludo && u) saludo.textContent = `Hola, ${u.nombre}`;
-};
+// --------- Perfil ---------
+function mountProfile() {
+  const nameEl = $('#nombrePerfil');
+  const mailEl = $('#correoPerfil');
+  const tipoEl = $('#tipoPerfil');
+  const btnOut = $('#cerrarSesion');
+  if (!nameEl && !mailEl && !btnOut) return;
 
-// ===== Registro =====
-const mountRegister = () => {
-    const form = $("#registroForm") || $("#formRegistro"); // soporta tus dos ids
-    if (!form) return;
+  const ses = getUser();
+  if (!ses?.token) {
+    alert('Debes iniciar sesión.');
+    return go('login.html');
+  }
 
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        // Soporta name o id en minúsculas/mayúsculas
-        const nombre = (form.nombre?.value ?? $("#Nombre")?.value ?? "").trim();
-        const email = (form.correo?.value ?? $("#Correo")?.value ?? "").trim();
-        const pass = (form.password?.value ?? $("#password")?.value ?? "");
-        const conf = (form.confirmar?.value ?? $("#Confirmar")?.value ?? "");
-
-        // Tipo de usuario: radios (mejor) o select (fallback)
-        const radioRol = $('input[name="tipoUsuario"]:checked');
-        const selectRol = $("#tipoUsuario");
-        const tipo = radioRol ? radioRol.value : (selectRol ? selectRol.value : "");
-
-        // Validaciones
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!nombre || !email || !pass) return alert("Todos los campos son obligatorios.");
-        if (!emailRegex.test(email)) return alert("Correo electrónico no válido.");
-        if (pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
-        if (pass !== conf) return alert("Las contraseñas no coinciden.");
-        if (!tipo) return alert("Selecciona tu tipo de usuario.");
-
-        // Extras si es negocio (si existen los campos)
-        const nombreComercial = $("#nombreComercial")?.value?.trim() || "";
-        const nit = $("#nit")?.value?.trim() || "";
-
-        const usuario = {
-            nombre,
-            email,
-            password: pass,             // Nota: cifrar en backend real
-            tipo,
-            nombreComercial,
-            nit,
-            sesionIniciada: false,
-            creadoEn: new Date().toISOString(),
-        };
-
-        setUser(usuario);
-        alert("Registro exitoso. Ahora puedes iniciar sesión.");
-        go("login.html");
+  apiFetch('/api/auth/me', { token: ses.token })
+    .then(resp => {
+      const u = resp.data || ses.user;
+      if (nameEl) nameEl.textContent = u.name || '';
+      if (mailEl) mailEl.textContent = u.email || '';
+      if (tipoEl && ses.tipo) tipoEl.textContent = ses.tipo;
+    })
+    .catch(() => {
+      // Si falla el endpoint, usa la copia local
+      const u = ses.user || {};
+      if (nameEl) nameEl.textContent = u.name || '';
+      if (mailEl) mailEl.textContent = u.email || '';
+      if (tipoEl && ses.tipo) tipoEl.textContent = ses.tipo;
     });
 
-    // Mostrar/ocultar extras según rol (si existen)
-    const extraFields = $("#extraFields");
-    if (extraFields) {
-        const onChangeRol = () => {
-            const val = $('input[name="tipoUsuario"]:checked')?.value || $("#tipoUsuario")?.value || "";
-            const negocio = val === "restaurante" || val === "supermercado";
-            extraFields.hidden = !negocio;
-        };
-        document.querySelectorAll('input[name="tipoUsuario"]').forEach(r => r.addEventListener("change", onChangeRol));
-        $("#tipoUsuario")?.addEventListener("change", onChangeRol);
-        onChangeRol();
-    }
-};
-
-// ===== Login =====
-const mountLogin = () => {
-    const form = $("#loginForm") || $("#formLogin");
-    if (!form) return;
-
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const email = (form.email?.value ?? $("#Correo")?.value ?? $("#correoLogin")?.value ?? "").trim();
-        const pass = (form.password?.value ?? $("#password")?.value ?? $("#passwordLogin")?.value ?? "");
-
-        const u = getUser();
-        if (u && u.email === email && u.password === pass) {
-            u.sesionIniciada = true;
-            setUser(u);
-            alert("Inicio de sesión exitoso.");
-            go("perfil.html"); // o panel_cliente.html si ya lo tienes
-        } else {
-            alert("Credenciales incorrectas.");
-        }
+  if (btnOut) {
+    btnOut.addEventListener('click', () => {
+      clearUser();
+      alert('Has cerrado sesión.');
+      go('login.html');
     });
+  }
+}
 
-    // Mostrar/ocultar contraseña si tienes botón 👁️
-    const toggle = $("#togglePass") || $("#togglePassLogin");
-    const passEl = $("#password") || $("#passwordLogin");
-    toggle?.addEventListener("click", () => {
-        if (!passEl) return;
-        passEl.type = passEl.type === "password" ? "text" : "password";
-        toggle.textContent = passEl.type === "password" ? "👁️" : "🙈";
-    });
-};
+// --------- Guards & Boot ---------
+const PUBLIC_PAGES = new Set(['login.html', 'registro.html', 'index.html', '']);
 
-// ===== Perfil =====
-const mountProfile = () => {
-    const nombreEl = $("#nombrePerfil");
-    const correoEl = $("#correoPerfil");
-    const tipoEl = $("#tipoPerfil");
-    if (!nombreEl && !correoEl && !tipoEl) return;
+function protectRoute() {
+  const p = pageName();
+  if (!PUBLIC_PAGES.has(p) && !isLoggedIn()) {
+    return go('login.html');
+  }
+}
 
-    const u = getUser();
-    if (!u || !u.sesionIniciada) return go("login.html");
+function avoidAuthWhenLogged() {
+  const p = pageName();
+  if (isLoggedIn() && (p === 'login.html' || p === 'registro.html')) {
+    return go('perfil.html');
+  }
+}
 
-    nombreEl && (nombreEl.textContent = u.nombre);
-    correoEl && (correoEl.textContent = u.email);
-    tipoEl && (tipoEl.textContent = u.tipo);
-
-    $("#cerrarSesion")?.addEventListener("click", () => {
-        const cur = getUser();
-        if (cur) { cur.sesionIniciada = false; setUser(cur); }
-        // o clearUser() si quieres limpiar todo
-        alert("Has cerrado sesión.");
-        go("login.html");
-    });
-};
-
-// ===== Bootstrap =====
-document.addEventListener("DOMContentLoaded", () => {
-    protectRoute();          // bloquea privadas si no hay sesión
-    avoidAuthWhenLogged();   // evita mostrar login/registro si ya hay sesión
-    setGreeting();           // "Hola, <nombre>" si hay span#saludoUsuario
-
-    // Monta handlers específicos
-    mountRegister();
-    mountLogin();
-    mountProfile();
+document.addEventListener('DOMContentLoaded', () => {
+  protectRoute();
+  avoidAuthWhenLogged();
+  updateHeaderLinks();
+  setGreeting();
+  mountRegister();
+  mountLogin();
+  mountProfile();
 });
 
-// ===== Función pública por si necesitas llamar desde HTML =====
-function cerrarSesion() {
-    const u = getUser();
-    if (u) { u.sesionIniciada = false; setUser(u); }
-    alert("Has cerrado sesión.");
-    go("login.html");
-}
-window.cerrarSesion = cerrarSesion;
+// Utilidad global opcional
+window.cerrarSesion = function cerrarSesion() {
+  clearUser();
+  alert('Has cerrado sesión.');
+  go('login.html');
+};
