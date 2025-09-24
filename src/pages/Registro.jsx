@@ -1,21 +1,100 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../style/main.scss";
 
-export default function Registro(){
+export default function Registro() {
+    const [nombre, setNombre] = useState("");
+    const [correo, setCorreo] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmar, setConfirmar] = useState("");
+    const [tipoUsuario, setTipoUsuario] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (password !== confirmar) {
+            alert("❌ Las contraseñas no coinciden");
+            return;
+        }
+
+        try {
+            const response = await fetch("https://webhook.latenode.com/79099/prod/7f81d6f6-303e-4e2b-9e51-02184a5f6d78", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nombre,
+                    email: correo,
+                    password,
+                    tipoUsuario,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("✅ Registro exitoso");
+                console.log("Usuario registrado:", data);
+            } else {
+                alert("❌ Error: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error al registrar usuario:", error);
+            alert("❌ Error en el servidor");
+        }
+    };
+
     return (
-        <section class="form-container">
-            <div class="form-header">
-                <img src="../assets/logo.png" alt="BiteBack Logo" class="form-logo"/>
-                    <h2>Registro de Usuario</h2>
+        <section className="form-container">
+            <div className="form-header">
+                <img
+                    src="../assets/logo.png"
+                    alt="BiteBack Logo"
+                    className="form-logo"
+                />
+                <h2>Registro de Usuario</h2>
             </div>
 
-            <form id="formRegistro">
-                <input type="text" id="Nombre" placeholder="Nombre completo" required />
-                <input type="email" id="Correo" placeholder="Correo electrónico" required />
-                <input type="password" id="password" placeholder="Contraseña" required />
-                <input type="password" id="Confirmar" placeholder="Confirmar Contraseña" required />
-                <select id="tipoUsuario" required>
+            <form id="formRegistro" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    id="Nombre"
+                    placeholder="Nombre completo"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    required
+                />
+                <input
+                    type="email"
+                    id="Correo"
+                    placeholder="Correo electrónico"
+                    value={correo}
+                    onChange={(e) => setCorreo(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    id="Confirmar"
+                    placeholder="Confirmar Contraseña"
+                    value={confirmar}
+                    onChange={(e) => setConfirmar(e.target.value)}
+                    required
+                />
+                <select
+                    id="tipoUsuario"
+                    value={tipoUsuario}
+                    onChange={(e) => setTipoUsuario(e.target.value)}
+                    required
+                >
                     <option value="">Selecciona tipo de Usuario</option>
                     <option value="Usuario">Usuario</option>
                     <option value="Administrador">Administrador</option>
@@ -24,12 +103,15 @@ export default function Registro(){
             </form>
 
             <p>
-                <Link to="/login" class="btn-primary">Iniciar sesión</Link>
+                <Link to="/login" className="btn-primary">
+                    Iniciar sesión
+                </Link>
             </p>
             <p>
-                <Link to="/" class="btn-secondary">Volver</Link>
+                <Link to="/" className="btn-secondary">
+                    Volver
+                </Link>
             </p>
-
         </section>
-    )
-};
+    );
+}
