@@ -1,18 +1,13 @@
-import { useEffect, useState } from "react";
-import { getProducts } from "../services/productService";
+import React from "react";
+
 
 export default function Products() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    getProducts().then(setProducts);
-  }, []);
 
   return (
     <div className="container mt-4">
       <h2>Productos</h2>
       <div className="row">
-        {products.map(p => (
+        {/*products.map(p => (
           <div key={p.id} className="col-md-4 mb-3">
             <div className="card h-100">
               <img src={p.image} alt={p.title} className="card-img-top" style={{ height: "200px", objectFit: "contain" }} />
@@ -23,7 +18,7 @@ export default function Products() {
               </div>
             </div>
           </div>
-        ))}
+        ))*/}
       </div>
     </div>
   );
