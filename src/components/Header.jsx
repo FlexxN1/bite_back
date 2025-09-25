@@ -1,31 +1,10 @@
 import React from "react";
-
-import { Link } from "react-router-dom";
-
-import logo from "@assets/logo.png"
 import logo1 from "@assets/img.png"
+import "../style/main.scss"
 
 export default function Header() {
     return (
         <>
-            <header className="header">
-                <div className="container__header">
-                <div className="container__items--header">
-                    <img src={logo} alt="BiteBack Logo"/>
-                    <h1>BiteBack</h1>
-                </div>
-                <nav>
-                    <a href="#inicio">Inicio</a>
-                    <Link to="/products">Productos</Link>
-                    <a href="/">Contacto</a>
-                    <Link to="/login" >Iniciar sesión</Link>
-                    <Link to="/registro" >Registrarse</Link>
-                    <Link to="/perfil" >Mi perfil</Link>
-
-                </nav>
-                </div>
-            </header>
-
             <section className="section__main">
                 <div className="section__main--info">
                 <h1>Tu seguridad es nuestra prioridad</h1>
