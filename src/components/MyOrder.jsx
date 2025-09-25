@@ -21,7 +21,7 @@ const MyOrder = ({ toggleOrders, setToggleOrders }) => {
                 onClick={() => setToggleOrders(!toggleOrders)}
             >
                 <img src={iconArrow} alt="arrow" />
-                <p className="title1">My order</p>
+                <p className="title1">Mi orden</p>
             </div>
             <div className="my-order-content">
                 {state.cart.map((product) => (
@@ -35,7 +35,7 @@ const MyOrder = ({ toggleOrders, setToggleOrders }) => {
                 <p>${state.total}</p>
             </div>
             <button>
-                <Link to="/checkout" className="primary-button">Checkou</Link>
+                <Link to="/checkout" className="primary-button">Comprar</Link>
             </button>
         </aside>
     );
