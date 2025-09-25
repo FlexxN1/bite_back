@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../style/main.scss";
+import logo from "@assets/logo.png"
 
 export default function Registro() {
     const [nombre, setNombre] = useState("");
@@ -49,7 +50,7 @@ export default function Registro() {
         <section className="form-container">
             <div className="form-header">
                 <img
-                    src="../assets/logo.png"
+                    src={logo}
                     alt="BiteBack Logo"
                     className="form-logo"
                 />

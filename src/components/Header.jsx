@@ -2,22 +2,26 @@ import React from "react";
 
 import { Link } from "react-router-dom";
 
+import logo from "@assets/logo.png"
+import logo1 from "@assets/img.png"
+
 export default function Header() {
     return (
         <>
             <header className="header">
                 <div className="container__header">
                 <div className="container__items--header">
-                    <img src="./assets/logo.png" alt="BiteBack Logo"/>
+                    <img src={logo} alt="BiteBack Logo"/>
                     <h1>BiteBack</h1>
                 </div>
                 <nav>
                     <a href="#inicio">Inicio</a>
-                    <a href="#productos">Productos</a>
-                    <a href="#contacto">Contacto</a>
+                    <Link to="/products">Productos</Link>
+                    <a href="/">Contacto</a>
                     <Link to="/login" >Iniciar sesión</Link>
                     <Link to="/registro" >Registrarse</Link>
                     <Link to="/perfil" >Mi perfil</Link>
+
                 </nav>
                 </div>
             </header>
@@ -35,7 +39,7 @@ export default function Header() {
                 <div>
                 <div>
                     <div className="card_shadow">
-                    <img src="./assets/img.png" className="logo-container" alt="Nuestros productos"/>
+                        <img src={logo1} className="logo-container" alt="Nuestros productos"/>
                     <div>
                         <h5 className="text-center">Firewall Inteligente</h5>
                         <p>Reduce el desperdicio de alimentos y compra productos cercanos a vencer.</p>
