@@ -1,0 +1,142 @@
+.MyOrder {
+    width: 360px;
+    padding: 24px;
+    box-sizing: border-box;
+    position: absolute;
+    right: 0;
+    animation: swipLeft 0.26s ease;
+    background-color: #FFFFFF;
+    top: 100px;
+    bottom: auto;
+    border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border: 1px solid #C7C7C7;
+    -webkit-animation: swipLeft 0.26s ease;
+    box-shadow: -5px 13px 14px 0px rgba(0, 0, 0, 0.39);
+}
+
+.my-order-content {
+    height: 400px;
+    overflow-y: auto;
+
+}
+
+.my-order-content::-webkit-scrollbar {
+    width: 0.8rem;
+}
+
+.my-order-content::-webkit-scrollbar-track {
+    background: #C7C7C7;
+    border-radius: 1rem;
+}
+
+.my-order-content::-webkit-scrollbar-thumb {
+    background-color: #ACD9B2;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+
+@keyframes swipLeft {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 360px;
+    }
+}
+
+.title-containerOrder {
+    display: flex;
+}
+
+.title-containerOrder img {
+    transform: rotate(180deg);
+    margin-right: 20px;
+    width: 8px;
+    cursor: pointer;
+}
+
+.title1 {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+
+.order {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: center;
+    background-color: #F7F7F7;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    padding: 10px 24px 0px 24px
+}
+
+.order p:nth-child(1) {
+    display: flex;
+    color: black;
+    flex-direction: column;
+}
+
+.order p span:nth-child(1) {
+    font-size: 16px;
+    color: black;
+    font-weight: bold;
+}
+
+.order p:nth-child(2) {
+    text-align: end;
+    color: black;
+    font-weight: bold;
+}
+button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    border: none;
+}
+.primary-button {
+        display: inline-block;
+        text-align: center;
+        background-color: #acd9b2;
+        outline: none;
+        border-radius: 8px;
+        border: none;
+        color: #ffffff;
+        width: 100%;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        height: 50px;
+        line-height: 50px;
+        text-decoration: none; 
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #96c59f;
+        }
+    }
+
+@media (max-width: 640px) {
+    .MyOrder {
+        width: 100%;
+    }
+
+    @keyframes swipLeft {
+        0% {
+            width: 0;
+        }
+
+        100% {
+            width: 100%;
+        }
+    }
+}

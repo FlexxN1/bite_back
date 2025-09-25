@@ -39,25 +39,6 @@ header {
   flex-wrap: wrap;
   padding: 0 15px;
 }
-
-.container__header nav {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.container__header nav a {
-  color: white;
-  text-decoration: none;
-  margin: 10px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.container__header nav a:hover {
-  text-decoration: underline;
-  color: var(--naranja);
-}
-
 .container__items--header {
   display: flex;
   justify-content: center;
