@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../style/main.scss";
+import "../style/Header.scss";
 import logo from "@assets/logo.png"
 
 export default function Registro() {

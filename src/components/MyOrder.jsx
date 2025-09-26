@@ -21,7 +21,7 @@ const MyOrder = ({ toggleOrders, setToggleOrders }) => {
                 onClick={() => setToggleOrders(!toggleOrders)}
             >
                 <img src={iconArrow} alt="arrow" />
-                <p className="title1">Mi orden</p>
+                <p className="title1">Mis compras</p>
             </div>
             <div className="my-order-content">
                 {state.cart.map((product) => (
@@ -32,7 +32,7 @@ const MyOrder = ({ toggleOrders, setToggleOrders }) => {
                 <p>
                     <span>Total</span>
                 </p>
-                <p>${state.total}</p>
+                <p>{state.total.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</p>
             </div>
             <button>
                 <Link to="/checkout" className="primary-button">Comprar</Link>

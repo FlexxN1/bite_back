@@ -1,0 +1,136 @@
+/* ===== HERO SECTION ===== */
+.section__main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #e9f7df 0%, #8fd694 100%);
+  text-align: center;
+}
+
+.section__main--info {
+  max-width: 700px;
+  margin-top: 200px;
+}
+
+.section__main--info h1 {
+  font-size: 2.5rem;
+  color: #2b7a2b;
+  margin-bottom: 15px;
+}
+
+.section__main--info p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #3b3b3b;
+}
+
+.btn {
+  background-color: #2b7a2b;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #256d25;
+}
+
+/* ===== CAROUSEL ===== */
+.carousel-section {
+  padding: 40px 20px;
+  background: #f2f2f2;
+  text-align: center;
+  padding-bottom: 150px;
+}
+
+.carousel-title {
+  margin-top: 150px;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #2b7a2b;
+  margin-bottom: 50px;
+}
+
+.carousel__container {
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.carousel__images {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  transition: transform 0.6s ease-in-out;
+}
+
+.carousel__img {
+  width: 240px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.carousel__img:hover {
+  transform: scale(1.05);
+}
+.gallery {
+  background: #eee;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.gallery-cell {
+  width: 66%;
+  height: 240px;
+  margin-right: 10px;
+  background-size: cover;
+  background-position: center;
+    background-repeat: no-repeat;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* bolitas (page dots) */
+.flickity-page-dots {
+  bottom: -25px;
+}
+
+.flickity-page-dots .dot {
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  background: #2b7a2b;
+}
+
+.flickity-page-dots .dot.is-selected {
+  opacity: 1;
+  background: #145214;
+}
+.about__section {
+  background: #f9fbe7;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #2e7d32;
+  padding-top: 150px;
+  padding-bottom: 150px;
+}
+
+.about__content h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about__content p {
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0.5rem auto;
+  line-height: 1.6;
+}

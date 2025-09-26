@@ -90,7 +90,7 @@ const Checkout = () => {
                 <h2>Resumen de la compra</h2>
                 {state.cart.map((item) => (
                     <div key={item.id}>
-                        {item.title} - ${item.price}
+                        {item.nombre} - ${item.precio}
                     </div>
                 ))}
                 <p><strong>Total: ${state.total}</strong></p>

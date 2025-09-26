@@ -12,7 +12,7 @@ const useInitialState = () => {
         setState({
             ...state,
             cart: [...state.cart, payload],
-            total: state.total + payload.price
+            total: state.total + Number(payload.precio),
         });
     };
     const removeFromCart = (payload) => {
@@ -20,7 +20,7 @@ const useInitialState = () => {
         setState({
             ...state,
             cart: [...newArray],
-            total: state.total - payload.price
+            total: state.total - Number(payload.precio)
         })
     }
 

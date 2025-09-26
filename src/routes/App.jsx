@@ -5,7 +5,7 @@ import Login from "@pages/Login";
 import Registro from "@pages/Registro";
 import Home from "@pages/Home";
 import Users from "@pages/Users";
-import Products from "@pages/Products";
+import Products from "@components/ProductList";
 import Perfil from "@pages/Perfil";
 import Navbar from '@components/Navbar';
 import useInitialState from '@hooks/useInitialState';

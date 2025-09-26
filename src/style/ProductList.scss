@@ -1,0 +1,26 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 80px;
+        /* = altura del header */
+        padding-bottom: 60px;
+        /* = altura del footer */
+        overflow-y: auto;
+        /* scroll solo en contenido */
+}
+.ProductList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 280px);
+    gap: 5px;
+    place-content: center;
+    margin: 3em 0 0 0;
+    flex: 1;
+        /* ocupa todo el espacio disponible */
+}
+
+@media (max-width: 640px) {
+    .ProductList {
+        grid-template-columns: repeat(auto-fill, 140px);
+    }
+}

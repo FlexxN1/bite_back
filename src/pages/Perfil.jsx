@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../style/main.scss";
+import "../style/Header.scss";
 
 export default function Perfil() {
     return (
