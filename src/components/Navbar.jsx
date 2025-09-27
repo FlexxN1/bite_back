@@ -2,7 +2,7 @@ import React, {useState, useContext}from "react"
 import { Link } from "react-router-dom"
 import logo from "@assets/logo.png"
 import "../style/navbar.scss"
-import "../style/shoppingCartitem.scss"
+import "../style/shoppingCartItem.scss"
 import AppContext from "@context/AppContext"
 import MyOrder from './MyOrder';
 import logoShopping from "@assets/icon_shopping_cart.svg"

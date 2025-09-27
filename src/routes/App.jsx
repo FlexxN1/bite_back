@@ -8,7 +8,7 @@ import Users from "@pages/Users";
 import Products from "@components/ProductList";
 import Perfil from "@pages/Perfil";
 import Navbar from '@components/Navbar';
-import useInitialState from '@hooks/useInitialState';
+import useInitialState from '../Hooks/useInitialState';
 import Checkout from '../pages/Checkout';
 import AppContext from '@context/AppContext';
 
