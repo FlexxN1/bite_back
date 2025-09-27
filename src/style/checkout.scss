@@ -1,123 +1,94 @@
 .checkout-page {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: "Poppins", sans-serif;
-
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        color: #222;
-        text-align: center;
-    }
-}
-
-.checkout-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2d572c, #4caf50);
+    padding: 40px 20px;
+}
 
-    label {
-        display: flex;
-        flex-direction: column;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #444;
-
-        input,
-        select {
-            margin-top: 8px;
-            padding: 12px;
-            font-size: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-
-            &:focus {
-                border-color: #ff6600;
-                outline: none;
-                box-shadow: 0 0 6px rgba(255, 102, 0, 0.3);
-            }
-        }
-    }
-
-    .primary-button {
-        padding: 14px;
-        font-size: 1rem;
-        font-weight: bold;
-        color: white;
-        background: linear-gradient(135deg, #ff6600, #ff8800);
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-
-        &:hover {
-            background: linear-gradient(135deg, #e05500, #ff6600);
-        }
-    }
+.checkout-page h1 {
+    color: #fff;
+    margin-bottom: 20px;
 }
 
 .checkout-summary {
-    margin-top: 30px;
+    background: #fff;
     padding: 20px;
-    border-top: 1px solid #eee;
-
-    h2 {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-        color: #333;
-    }
-
-    div {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        font-size: 0.95rem;
-        color: #555;
-        border-bottom: 1px solid #f2f2f2;
-
-        &:last-child {
-            border-bottom: none;
-        }
-    }
-
-    p {
-        margin-top: 15px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-align: right;
-        color: #222;
-    }
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 500px;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-    .checkout-page {
-        padding: 20px;
-    }
+.checkout-summary h2 {
+    color: #2d572c;
+    margin-bottom: 15px;
+}
 
-    .checkout-form {
-        label {
-            font-size: 0.9rem;
+.checkout-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
 
-            input,
-            select {
-                font-size: 0.9rem;
-            }
-        }
-    }
+.checkout-total {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2d572c;
+}
 
-    .checkout-summary {
-        h2 {
-            font-size: 1.2rem;
-        }
+.checkout-form {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
 
-        p {
-            font-size: 1rem;
-        }
-    }
+.checkout-form label {
+    display: flex;
+    flex-direction: column;
+    color: #2d572c;
+    font-weight: 500;
+}
+
+.checkout-form input,
+.checkout-form select {
+    margin-top: 5px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.btn-primary {
+    background: #2d572c;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+.btn-primary:hover {
+    background: #45a049;
+}
+.btn-secondary {
+    color: #ffffff;
+    background: #062b08;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease;
 }
