@@ -2,11 +2,11 @@
   "name": "bite_back",
   "version": "1.0.0",
   "description": "Es una SPA construida en React.js con el objetivo de simular una tienda virtual de comercio.",
-  "main": "main.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --open --config webpack.config.dev.js",
-    "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects"
+      "dev": "webpack serve --open --config webpack.config.dev.js",
+      "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects",
+      "start": "node src/app.js"
   },
   "keywords": [
     "javascript",
