@@ -35,8 +35,13 @@ CREATE TABLE IF NOT EXISTS compras (
     usuario_id INT NOT NULL, -- el cliente que compra
     fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(10,2) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20),
+    estado ENUM('pendiente', 'pagado', 'enviado', 'cancelado') DEFAULT 'pendiente',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
+
 
 -- ======================================
 -- Tabla detalle de compras
@@ -70,8 +75,10 @@ VALUES
 ('Aguacate Criollo', 'Pequeño pero muy sabroso', 3500, 50, 4, 'https://example.com/imagenes/aguacate_criollo.jpg');
 
 -- Ejemplo de compra
-INSERT INTO compras (usuario_id, total)
-VALUES (1, 2000);
+INSERT INTO compras (usuario_id, total, ciudad, direccion, telefono, estado)
+VALUES (1, 20000, 'Bogotá', 'Calle 123 #45-67', '3001234567', 'pendiente');
+
 
 INSERT INTO detalle_compras (compra_id, producto_id, cantidad, precio_unitario)
-VALUES (1, 1, 1, 2000);
+VALUES (1, 2, 3, 3500);
+

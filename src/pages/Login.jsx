@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../style/Header.scss";
+import "../style/login.scss";
 import logo from "@assets/logo.png"
 
 export default function Login() {
@@ -47,7 +47,7 @@ export default function Login() {
                 />
             </div>
 
-            <section className="form-container">
+            <section className="form-container__form">
                 <h2>Iniciar Sesión</h2>
                 <form id="formLogin" onSubmit={handleSubmit}>
                     <input
