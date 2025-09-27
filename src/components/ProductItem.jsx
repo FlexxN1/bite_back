@@ -1,12 +1,9 @@
 import React, { useContext } from 'react';
 import '../style/ProductItem.scss';
 import AppContext from '@context/AppContext';
-import ProductDetail from '@components/ProductDetail';
 import addToCartImage from '../assets/bt_add_to_cart.svg';
 import addedToCartImage from '../assets/bt_added_to_cart.svg';
 import img from "../assets/img.png";
-
-// 👇 imagen de error (la pones tú en assets)
 import imgError from "../assets/errorImg.jpg";
 
 const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
@@ -29,8 +26,8 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
                 loading="lazy"
                 alt={product.descripcion}
                 className="productImage"
-                onClick={() => isOpen ? closeProduct() : openProduct()}
-                onError={(e) => { e.target.src = imgError; }} // 👈 fallback
+                onClick={() => (isOpen ? closeProduct() : openProduct())}
+                onError={(e) => { e.target.src = imgError; }}
             />
             <div className="product-info">
                 <div>
@@ -41,14 +38,6 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
                     <img src={verifyAdded(product)} alt={product.nombre} />
                 </figure>
             </div>
-            {isOpen && (
-                <ProductDetail
-                    product={product}
-                    setToggleProduct={closeProduct}
-                    handleClick={handleClick}
-                    isAdded={state.cart.includes(product)}
-                />
-            )}
         </div>
     );
 };

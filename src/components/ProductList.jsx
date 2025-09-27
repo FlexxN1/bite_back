@@ -1,38 +1,15 @@
-// src/pages/ProductList.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import ProductItem from '@components/ProductItem';
-import SkeletonProduct from '@components/SkeletonProduct'; // 👈 skeleton
+import ProductDetail from '@components/ProductDetail';
+import SkeletonProduct from '@components/SkeletonProduct';
 import useGetProducts from '../Hooks/useGetProducts';
 import Loader from '@components/Loader';
 import '../style/ProductList.scss';
 import "../style/Header.scss";
 
-const productos = {
-    "productos": [
-        {
-            "id": 1,
-            "nombre": "Aguacate Hass",
-            "descripcion": "Aguacate fresco de exportación",
-            "precio": "5000.00",
-            "imagen_url": "https://example.com/imagenes/aguacate_hass.jpg",
-            "stock": 100,
-            "vendedor_id": 1,
-            "fecha_creacion": "2025-09-25T01:56:41.000Z"
-        },
-        {
-            "id": 2,
-            "nombre": "Aguacate Criollo",
-            "descripcion": "Pequeño pero muy sabroso",
-            "precio": "3500.00",
-            "imagen_url": "https://example.com/imagenes/aguacate_criollo.jpg",
-            "stock": 80,
-            "vendedor_id": 2,
-            "fecha_creacion": "2025-09-25T01:56:41.000Z"
-        }
-    ]
-};
+const productos = { "productos": [] };
 
-// Generamos hasta id: 60
+// Generar hasta id: 60
 for (let i = 3; i <= 60; i++) {
     productos.productos.push({
         id: i,
@@ -57,20 +34,20 @@ const ProductList = () => {
 
     const loaderRef = useRef(null);
 
-    // Skeleton inicial (2s)
+    // Skeleton inicial
     useEffect(() => {
         const timer = setTimeout(() => setShowSkeleton(false), 2000);
         return () => clearTimeout(timer);
     }, []);
 
-    // Mostrar los primeros productos
+    // Mostrar de a 8
     useEffect(() => {
         if (products.length > 0) {
             setVisibleProducts(products.slice(0, 8));
         }
     }, [products]);
 
-    // Observer para infinite scroll
+    // Observer scroll infinito
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -80,7 +57,6 @@ const ProductList = () => {
             },
             { threshold: 0.9 }
         );
-
         if (loaderRef.current) observer.observe(loaderRef.current);
         return () => observer.disconnect();
     }, [loadingMore, visibleProducts, products]);
@@ -89,7 +65,6 @@ const ProductList = () => {
         if (visibleProducts.length >= products.length) return;
         setLoadingMore(true);
 
-        // ⏳ simular skeleton durante 2s antes de mostrar los nuevos
         setTimeout(() => {
             const nextPage = page + 1;
             const newProducts = products.slice(0, Math.min(products.length, nextPage * 8));
@@ -99,9 +74,6 @@ const ProductList = () => {
         }, 2000);
     };
 
-    const openProduct = (product) => setSelectedProduct(product);
-    const closeProduct = () => setSelectedProduct(null);
-
     return (
         <section className="main-container">
             {loading ? (
@@ -109,27 +81,23 @@ const ProductList = () => {
             ) : (
                 <>
                     <div className="ProductList">
-                        {/* skeleton inicial */}
-                        {showSkeleton ? (
-                            Array.from({ length: 8 }).map((_, i) => (
+                        {showSkeleton
+                            ? Array.from({ length: 8 }).map((_, i) => (
                                 <div key={`sk-init-${i}`} className="fade-in">
                                     <SkeletonProduct />
                                 </div>
                             ))
-                        ) : (
-                            visibleProducts.map((product, index) => (
+                            : visibleProducts.map((product, index) => (
                                 <div key={`${product.id}-${index}`} className="fade-in">
                                     <ProductItem
                                         product={product}
                                         isOpen={selectedProduct?.id === product.id}
-                                        openProduct={() => openProduct(product)}
-                                        closeProduct={closeProduct}
+                                        openProduct={() => setSelectedProduct(product)}
+                                        closeProduct={() => setSelectedProduct(null)}
                                     />
                                 </div>
-                            ))
-                        )}
+                            ))}
 
-                        {/* skeleton mientras carga más productos en scroll */}
                         {loadingMore &&
                             Array.from({ length: 4 }).map((_, i) => (
                                 <div key={`sk-load-${i}`} className="fade-in">
@@ -138,16 +106,24 @@ const ProductList = () => {
                             ))}
                     </div>
 
-                    {/* loader de scroll infinito abajo */}
-                    <div ref={loaderRef} className="infinite-loader">
-                        {loadingMore ? (
-                            <p className="loading-text">Cargando más productos...</p>
-                        ) : visibleProducts.length < products.length ? (
-                            <p className="scroll-hint">Desliza para cargar más productos</p>
-                        ) : (
-                            <p className="no-more">No hay más productos</p>
-                        )}
-                    </div>
+                    {/* loader de scroll infinito */}
+                        <div ref={loaderRef} className="infinite-loader">
+                            {loadingMore ? (
+                                <p className="loading-text">Cargando más productos...</p>
+                            ) : visibleProducts.length < products.length ? (
+                                <p className="scroll-hint">Desliza para cargar más productos</p>
+                            ) : (
+                                <p className="no-more">No hay más productos</p>
+                            )}
+                        </div>
+                    {selectedProduct && (
+                        <ProductDetail
+                            product={selectedProduct}
+                            setToggleProduct={() => setSelectedProduct(null)}
+                            handleClick={() => { }}
+                            isAdded={false}
+                        />
+                    )}
                 </>
             )}
         </section>

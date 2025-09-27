@@ -32,7 +32,6 @@ export default function Navbar (){
                 <nav>
                     <Link to="/">Inicio</Link>
                     <Link to="/products">Productos</Link>
-                    <a href="/">Contacto</a>
                     <Link to="/login" >Iniciar sesión</Link>
                     <Link to="/registro" >Registrarse</Link>
                     <Link to="/perfil" >Mi perfil</Link>
