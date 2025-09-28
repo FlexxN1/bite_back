@@ -7,10 +7,9 @@ import Loader from '@components/Loader';
 import '../style/ProductList.scss';
 import "../style/Header.scss";
 
-const productos = { "productos": [] };
 
 const ProductList = () => {
-    const { products, loading } = useGetProducts(productos);
+    const { products, loading } = useGetProducts();
 
     const [visibleProducts, setVisibleProducts] = useState([]);
     const [page, setPage] = useState(1);

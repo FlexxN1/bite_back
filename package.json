@@ -4,9 +4,9 @@
   "description": "Es una SPA construida en React.js con el objetivo de simular una tienda virtual de comercio.",
   "main": "src/app.js",
   "scripts": {
-      "dev": "webpack serve --open --config webpack.config.dev.js",
-      "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects"
-},
+    "start": "webpack serve --open --config webpack.config.dev.js",
+    "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects"
+  },
   "keywords": [
     "javascript",
     "ecmascript"
@@ -24,7 +24,6 @@
     "bcrypt": "^6.0.0",
     "clean-webpack-plugin": "^4.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "flickity": "^3.0.0",
     "html-loader": "^5.1.0",
@@ -39,11 +38,14 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.2",
+    "dotenv": "^17.2.2",
     "mini-css-extract-plugin": "^2.9.4",
     "nodemon": "^3.1.10",
+    "react-refresh": "^0.17.0",
     "sass": "^1.93.2",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",

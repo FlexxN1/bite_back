@@ -1,6 +1,12 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+
+dotenv.config();
+
 
 module.exports = {
     entry: './src/index.js',
@@ -13,16 +19,14 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.jsx'],
         alias: {
-            '@components': path.resolve(__dirname, 'src/components/'),
-            '@containers': path.resolve(__dirname, 'src/containers/'),
-            '@pages': path.resolve(__dirname, 'src/pages/'),
-            '@hooks': path.resolve(__dirname, 'src/hooks/'),
-            '@routes': path.resolve(__dirname, 'src/routes/'),
-            '@context': path.resolve(__dirname, 'src/context/'),
-            '@style': path.resolve(__dirname, 'src/styles/'),
-            '@assets': path.resolve(__dirname, 'src/assets/'),
-            '@assets': path.resolve(__dirname, 'src/assets/')
-        }
+            "@components": path.resolve(__dirname, "src/components/"),
+            "@pages": path.resolve(__dirname, "src/pages/"),
+            "@context": path.resolve(__dirname, "src/context/"),
+            "@style": path.resolve(__dirname, "src/style/"),
+            "@Hooks": path.resolve(__dirname, "src/Hooks/"),
+            "@routes": path.resolve(__dirname, "src/routes/"),
+            "@assets": path.resolve(__dirname, "src/assets/"),
+        },
     },
     module: {
         rules: [
@@ -30,7 +34,7 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader'
+                    loader: 'babel-loader',
                 }
             },
             {
@@ -62,16 +66,22 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: '[name].css'
-        })
+        }),
+        new webpack.DefinePlugin({
+            "process.env.REACT_APP_API_URL": JSON.stringify(process.env.REACT_APP_API_URL || "http://localhost:3000")
+        }),
+        new ReactRefreshWebpackPlugin()
+
     ],
     devServer: {
-        compress: true,
+        static: {
+            directory: path.resolve(__dirname, "public"),
+        },
         historyApiFallback: true,
-        port: 3000
-    }
-    /*devServer: {
-        static: path.join(__dirname, 'dist'), esta es la nueva forma de configurar el 'devServer' con esta configuracion tambien nos deja ejecutar el comando 'npm run start'
+        hot: true, // 👈 Hot Module Replacement
+        open: true,
         compress: true,
-        port: 8000
-    }*/
+        port: 3000,
+        watchFiles: ["src/**/*", "public/**/*"],
+    },
 }
