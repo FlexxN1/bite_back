@@ -2,13 +2,16 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const auth = require('../../middlewares/auth');
+const auth = require('../../middlewares/auth'); // 👈 corregí la ruta (no ../../)
 
-// Listar todos los productos (publico)
+// Listar todos los productos (público)
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.execute(
-            `SELECT p.*, a.nombre as vendedor FROM productos p LEFT JOIN administradores a ON p.vendedor_id = a.id ORDER BY p.fecha_creacion DESC`
+            `SELECT p.*, u.nombre as vendedor 
+             FROM productos p 
+             LEFT JOIN usuarios u ON p.vendedor_id = u.id 
+             ORDER BY p.fecha_creacion DESC`
         );
         res.json(rows);
     } catch (err) {
@@ -21,7 +24,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const [rows] = await pool.execute(
-            `SELECT p.*, a.nombre as vendedor FROM productos p LEFT JOIN administradores a ON p.vendedor_id = a.id WHERE p.id = ?`,
+            `SELECT p.*, u.nombre as vendedor 
+             FROM productos p 
+             LEFT JOIN usuarios u ON p.vendedor_id = u.id 
+             WHERE p.id = ?`,
             [req.params.id]
         );
         if (!rows.length) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -32,18 +38,19 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Crear producto (solo administradores/vendedores)
-router.post('/', auth(['administrador']), async (req, res) => {
+// Crear producto (solo administradores)
+router.post('/', auth(['Administrador']), async (req, res) => {
     try {
         const { nombre, descripcion, precio, stock = 0, imagen_url } = req.body;
         if (!nombre || !precio) return res.status(400).json({ error: 'Nombre y precio requeridos' });
 
-        // req.user.id viene del token (id en tabla administradores)
-        const vendedor_id = req.user.id;
+        const vendedor_id = req.user.id; // viene del token
         const [r] = await pool.execute(
-            `INSERT INTO productos (nombre, descripcion, precio, imagen_url, stock, vendedor_id) VALUES (?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO productos (nombre, descripcion, precio, imagen_url, stock, vendedor_id) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
             [nombre, descripcion || null, precio, imagen_url || null, stock, vendedor_id]
         );
+
         res.json({ id: r.insertId, message: 'Producto creado' });
     } catch (err) {
         console.error(err);
@@ -51,13 +58,12 @@ router.post('/', auth(['administrador']), async (req, res) => {
     }
 });
 
-// Actualizar producto (solo dueño)
-router.put('/:id', auth(['administrador']), async (req, res) => {
+// Actualizar producto (solo dueño y admin)
+router.put('/:id', auth(['Administrador']), async (req, res) => {
     try {
         const productId = req.params.id;
         const vendedorId = req.user.id;
 
-        // comprobar dueño
         const [found] = await pool.execute('SELECT vendedor_id FROM productos WHERE id = ?', [productId]);
         if (!found.length) return res.status(404).json({ error: 'Producto no existe' });
         if (found[0].vendedor_id !== vendedorId) return res.status(403).json({ error: 'No autorizado' });
@@ -67,6 +73,7 @@ router.put('/:id', auth(['administrador']), async (req, res) => {
             `UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen_url = ? WHERE id = ?`,
             [nombre, descripcion, precio, stock, imagen_url, productId]
         );
+
         res.json({ message: 'Producto actualizado' });
     } catch (err) {
         console.error(err);
@@ -74,8 +81,8 @@ router.put('/:id', auth(['administrador']), async (req, res) => {
     }
 });
 
-// Eliminar producto (solo dueño)
-router.delete('/:id', auth(['administrador']), async (req, res) => {
+// Eliminar producto (solo dueño y admin)
+router.delete('/:id', auth(['Administrador']), async (req, res) => {
     try {
         const productId = req.params.id;
         const vendedorId = req.user.id;

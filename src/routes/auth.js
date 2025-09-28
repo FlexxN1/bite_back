@@ -1,3 +1,4 @@
+// src/routes/auth.js
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
@@ -7,53 +8,48 @@ require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 
+// Registro
 router.post('/register', async (req, res) => {
-    const { nombre, email, password, role = 'cliente' } = req.body;
+    const { nombre, email, password, tipo_usuario = 'Cliente' } = req.body;
     if (!nombre || !email || !password) return res.status(400).json({ error: 'Faltan datos' });
 
     try {
-        // elegimos tabla según role
-        const table = (role === 'administrador' || role === 'vendedor') ? 'administradores' : 'clientes';
-
-        // revisar si email existe
-        const [found] = await pool.execute(`SELECT id FROM ${table} WHERE email = ?`, [email]);
+        const [found] = await pool.execute(`SELECT id FROM usuarios WHERE email = ?`, [email]);
         if (found.length) return res.status(409).json({ error: 'Email ya registrado' });
 
         const hash = await bcrypt.hash(password, 10);
-        const [r] = await pool.execute(`INSERT INTO ${table} (nombre, email, password) VALUES (?, ?, ?)`, [nombre, email, hash]);
+        const [r] = await pool.execute(
+            `INSERT INTO usuarios (nombre, email, password, tipo_usuario) VALUES (?, ?, ?, ?)`,
+            [nombre, email, hash, tipo_usuario]
+        );
         const id = r.insertId;
 
-        const token = jwt.sign({ id, role: (table === 'administradores' ? 'administrador' : 'cliente'), nombre, table }, JWT_SECRET, { expiresIn: '8h' });
-        res.json({ token, user: { id, nombre, email, role: (table === 'administradores' ? 'administrador' : 'cliente') } });
+        const token = jwt.sign({ id, tipo_usuario, nombre }, JWT_SECRET, { expiresIn: '8h' });
+        res.json({ token, user: { id, nombre, email, tipo_usuario } });
     } catch (err) {
-        console.error(err);
+        console.error("❌ Error en /register:", err);
         res.status(500).json({ error: 'Error servidor' });
     }
 });
 
+// Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Faltan datos' });
 
     try {
-        // buscar en administradores y clientes
-        let user = null;
-        let table = null;
-        for (const t of ['administradores', 'clientes']) {
-            const [rows] = await pool.execute(`SELECT * FROM ${t} WHERE email = ?`, [email]);
-            if (rows.length) { user = rows[0]; table = t; break; }
-        }
-        if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
+        const [rows] = await pool.execute(`SELECT * FROM usuarios WHERE email = ?`, [email]);
+        if (!rows.length) return res.status(401).json({ error: 'Credenciales inválidas' });
 
+        const user = rows[0];
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) return res.status(401).json({ error: 'Credenciales inválidas' });
 
-        const role = (table === 'administradores') ? 'administrador' : 'cliente';
-        const token = jwt.sign({ id: user.id, role, nombre: user.nombre, table }, JWT_SECRET, { expiresIn: '8h' });
+        const token = jwt.sign({ id: user.id, tipo_usuario: user.tipo_usuario, nombre: user.nombre }, JWT_SECRET, { expiresIn: '8h' });
 
-        res.json({ token, user: { id: user.id, nombre: user.nombre, email: user.email, role } });
+        res.json({ token, user: { id: user.id, nombre: user.nombre, email: user.email, tipo_usuario: user.tipo_usuario } });
     } catch (err) {
-        console.error(err);
+        console.error("❌ Error en /login:", err);
         res.status(500).json({ error: 'Error servidor' });
     }
 });
