@@ -1,11 +1,11 @@
 const mysql = require("mysql2/promise");
 
 const pool = mysql.createPool({
-    user: "u9qmbwqvt9ojhey5",
-    password: "FpWYqD99X605YXS46VnS",
-    host: "bhc2g6pxbayk4bkibxfe-mysql.services.clever-cloud.com",
-    port: 3306,
-    database: "bhc2g6pxbayk4bkibxfe"
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_NAME
 });
 
 module.exports = pool;
