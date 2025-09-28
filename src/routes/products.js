@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const auth = require('../middlewares/auth');
+const auth = require('../../middlewares/auth');
 
 // Listar todos los productos
 router.get('/', async (req, res) => {

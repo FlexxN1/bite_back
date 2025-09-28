@@ -9,7 +9,7 @@ const app = express();
 
 // Configuración de CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*'
+  origin: process.env.FRONTEND_URL || '*'
 }));
 
 // Middleware para parsear JSON
@@ -21,16 +21,16 @@ app.use('/api/products', productRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
-    res.json({
-        ok: true,
-        message: 'API funcionando 🚀',
-        env: process.env.NODE_ENV || 'dev'
-    });
+  res.json({
+    ok: true,
+    message: 'API funcionando 🚀',
+    env: process.env.NODE_ENV || 'dev'
+  });
 });
 
 // Puerto dinámico que Railway asigna
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`✅ API corriendo en puerto ${PORT}`);
+  console.log(`✅ API corriendo en puerto ${PORT}`);
 });
