@@ -3,7 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const dotenv = require('dotenv');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 dotenv.config();
 
@@ -69,9 +68,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             "process.env.REACT_APP_API_URL": JSON.stringify(process.env.REACT_APP_API_URL || "http://localhost:3000")
-        }),
-        new ReactRefreshWebpackPlugin()
-
+        })
     ],
     devServer: {
         static: {
