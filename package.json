@@ -5,9 +5,7 @@
   "main": "src/app.js",
   "scripts": {
       "dev": "webpack serve --open --config webpack.config.dev.js",
-      "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects",
-      "start": "node src/app.js",
-      "test-db": "node src/test-db.js"
+      "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects"
 },
   "keywords": [
     "javascript",
