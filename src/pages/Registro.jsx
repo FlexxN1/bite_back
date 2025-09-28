@@ -1,51 +1,56 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "../style/registro.scss"; // 👈 nuevo scss
+import { Link, useNavigate } from "react-router-dom";
+import "../style/registro.scss";
 import logo from "@assets/logo.png";
+import { API_URL } from "../config";
 
 export default function Registro() {
+    const navigate = useNavigate();
     const [nombre, setNombre] = useState("");
     const [correo, setCorreo] = useState("");
     const [password, setPassword] = useState("");
     const [confirmar, setConfirmar] = useState("");
     const [tipoUsuario, setTipoUsuario] = useState("");
+    const [error, setError] = useState("");  // <-- nuevo estado para errores
+    const [success, setSuccess] = useState(""); // <-- para mostrar éxito
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+        setSuccess("");
 
         if (password !== confirmar) {
-            alert("❌ Las contraseñas no coinciden");
+            setError("❌ Las contraseñas no coinciden");
             return;
         }
 
         try {
-            const response = await fetch(
-                "https://webhook.latenode.com/79099/prod/7f81d6f6-303e-4e2b-9e51-02184a5f6d78",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        nombre,
-                        email: correo,
-                        password,
-                        tipoUsuario,
-                    }),
-                }
-            );
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nombre,
+                    email: correo,
+                    password,
+                    tipoUsuario,
+                }),
+            });
 
             const data = await response.json();
 
             if (response.ok) {
-                alert("✅ Registro exitoso");
+                setSuccess("✅ Registro exitoso");
+                setTimeout(() => navigate("/perfil"), 1500); // redirige después de 1.5s
                 console.log("Usuario registrado:", data);
             } else {
-                alert("❌ Error: " + data.message);
+                // Mostrar el mensaje que viene del backend
+                setError("❌ " + (data.error || data.message || "Error desconocido"));
             }
         } catch (error) {
             console.error("Error al registrar usuario:", error);
-            alert("❌ Error en el servidor");
+            setError("❌ Error en el servidor");
         }
     };
 
@@ -99,7 +104,12 @@ export default function Registro() {
                     <option value="Usuario">Usuario</option>
                     <option value="Administrador">Administrador</option>
                 </select>
+
                 <button type="submit">Registrarse</button>
+
+                {/* Mostrar errores o éxito */}
+                {error && <p className="error-msg">{error}</p>}
+                {success && <p className="success-msg">{success}</p>}
             </form>
 
             <div className="form-registro-links">
