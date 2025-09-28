@@ -22,7 +22,7 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
     return (
         <div className="ProductItem">
             <img
-                src={product.imagen_urll || img}
+                src={product.imagen_url || img}
                 loading="lazy"
                 alt={product.descripcion}
                 className="productImage"

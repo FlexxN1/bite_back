@@ -21,7 +21,7 @@ const ProductInfo = ({ product, setToggleProduct, setToggleOrders, isAdded }) =>
     return (
         <>
             <img
-                src={product.imagen_urll || img}
+                src={product.imagen_url || img}
                 alt={product.nombre}
                 className="product"
             />
