@@ -1,5 +1,5 @@
 const express = require("express");
-const pool = require("./db"); // db.js debe exportar el pool con module.exports
+const pool = require("./db");
 
 const app = express();
 
@@ -27,6 +27,19 @@ app.get("/create", async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("server on port 3000");
+// 🚀 Aquí agregas tu endpoint de clientes
+app.get("/clientes", async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM clientes");
+        res.json(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Error al obtener clientes" });
+    }
+});
+
+// Railway usa process.env.PORT
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`server on port ${PORT}`);
 });
