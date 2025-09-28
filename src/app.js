@@ -1,25 +1,36 @@
-// src/app.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+
 const app = express();
 
-// middlewares
-app.use(cors({ origin: '*' }));
+// Configuración de CORS
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*'
+}));
+
+// Middleware para parsear JSON
 app.use(express.json());
 
-// Ruta básica para probar que la API responde
+// Rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+
+// Ruta de prueba
 app.get('/', (req, res) => {
     res.json({
         ok: true,
-        msg: '🚀 API viva y respondiendo sin DB',
-        env: process.env.NODE_ENV || 'dev',
-        port: process.env.PORT || 3000,
+        message: 'API funcionando 🚀',
+        env: process.env.NODE_ENV || 'dev'
     });
 });
 
-// Puerto
+// Puerto dinámico que Railway asigna
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-    console.log(`✅ API running on port ${PORT}`);
+    console.log(`✅ API corriendo en puerto ${PORT}`);
 });
