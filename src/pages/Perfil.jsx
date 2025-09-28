@@ -9,14 +9,11 @@ export default function Perfil() {
     const { user, logout } = useContext(AppContext);
     const navigate = useNavigate();
 
-    if (!user) {
-        return <p>Cargando perfil...</p>;
-    }
-
     const handleLogout = () => {
-        logout(); // limpia localStorage y estado global
-        navigate("/"); // redirige al home
+        logout();
+        navigate("/");
     };
+
 
     return (
         <section className="perfil-container">

@@ -6,9 +6,10 @@ import AppContext from "@context/AppContext";
 export default function PrivateRoute({ children }) {
     const { user } = useContext(AppContext);
 
-    if (user === null) {
-        return <p style={{ textAlign: "center" }}>Verificando sesión...</p>;
+    // Si no hay usuario logueado, redirige directamente al login
+    if (!user) {
+        return <Navigate to="/login" replace />;
     }
 
-    return user ? children : <Navigate to="/login" />;
+    return children;
 }

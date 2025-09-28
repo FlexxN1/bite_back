@@ -11,22 +11,13 @@ const useInitialState = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         const savedUser = localStorage.getItem("userData");
+
         if (token && savedUser) {
             setUser(JSON.parse(savedUser));
         } else {
-            // 🔹 Simulación SOLO si nunca ha iniciado sesión
-            const fakeUser = {
-                id: 1,
-                nombre: "Juan Pérez",
-                email: "juan@example.com",
-                tipo_usuario: "Administrador", // o "Cliente"
-                token: "fake-token-123",
-            };
-            localStorage.setItem("token", fakeUser.token);
-            localStorage.setItem("userData", JSON.stringify(fakeUser));
-            setUser(fakeUser);
+            setUser(null); // 👈 sin sesión
         }
-    }, []); // 👈 corre solo al montar
+    }, []);
 
     // funciones de carrito
     const addToCart = (payload) => {

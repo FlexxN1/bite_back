@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../style/registro.scss";
 import logo from "@assets/logo.png";
+import { toast } from "../utils/toast"; // 👈 importamos el helper
 import { API_URL } from "../config";
 
 export default function Registro() {
@@ -11,16 +12,15 @@ export default function Registro() {
     const [password, setPassword] = useState("");
     const [confirmar, setConfirmar] = useState("");
     const [tipoUsuario, setTipoUsuario] = useState("");
-    const [error, setError] = useState("");  // <-- nuevo estado para errores
-    const [success, setSuccess] = useState(""); // <-- para mostrar éxito
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-        setSuccess("");
 
         if (password !== confirmar) {
-            setError("❌ Las contraseñas no coinciden");
+            toast.fire({
+                icon: "error",
+                title: "❌ Las contraseñas no coinciden",
+            });
             return;
         }
 
@@ -41,16 +41,25 @@ export default function Registro() {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess("✅ Registro exitoso");
-                setTimeout(() => navigate("/perfil"), 1500); // redirige después de 1.5s
+                toast.fire({
+                    icon: "success",
+                    title: "✅ Registro exitoso",
+                });
+
+                setTimeout(() => navigate("/login"), 1500);
                 console.log("Usuario registrado:", data);
             } else {
-                // Mostrar el mensaje que viene del backend
-                setError("❌ " + (data.error || data.message || "Error desconocido"));
+                toast.fire({
+                    icon: "error",
+                    title: `❌ ${data.error || data.message || "Error desconocido"}`,
+                });
             }
         } catch (error) {
             console.error("Error al registrar usuario:", error);
-            setError("❌ Error en el servidor");
+            toast.fire({
+                icon: "error",
+                title: "❌ Error en el servidor",
+            });
         }
     };
 
@@ -106,10 +115,6 @@ export default function Registro() {
                 </select>
 
                 <button type="submit">Registrarse</button>
-
-                {/* Mostrar errores o éxito */}
-                {error && <p className="error-msg">{error}</p>}
-                {success && <p className="success-msg">{success}</p>}
             </form>
 
             <div className="form-registro-links">
