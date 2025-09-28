@@ -1,20 +1,25 @@
-require('dotenv').config();
+// src/app.js
 const express = require('express');
 const cors = require('cors');
 
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+// middlewares
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
+// Ruta básica para probar que la API responde
+app.get('/', (req, res) => {
+    res.json({
+        ok: true,
+        msg: '🚀 API viva y respondiendo sin DB',
+        env: process.env.NODE_ENV || 'dev',
+        port: process.env.PORT || 3000,
+    });
+});
 
-app.get('/', (req, res) => res.json({ ok: true, env: process.env.NODE_ENV || 'dev' }));
-
+// Puerto
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`API running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`✅ API running on port ${PORT}`);
+});
