@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Es una SPA construida en React.js con el objetivo de simular una tienda virtual de comercio.",
   "main": "src/app.js",
+  "type": "module",
   "scripts": {
       "dev": "webpack serve --open --config webpack.config.dev.js",
       "build": "webpack --mode production --config webpack.config.js && echo '/* /index.html 200' | cat > dist/_redirects",
