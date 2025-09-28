@@ -2,9 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const auth = require('../../middlewares/auth'); // 👈 corregí la ruta (no ../../)
+const auth = require('../middlewares/auth');
 
-// Listar todos los productos (público)
+// Listar todos los productos
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.execute(
@@ -14,24 +14,6 @@ router.get('/', async (req, res) => {
              ORDER BY p.fecha_creacion DESC`
         );
         res.json(rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error servidor' });
-    }
-});
-
-// Obtener producto por id
-router.get('/:id', async (req, res) => {
-    try {
-        const [rows] = await pool.execute(
-            `SELECT p.*, u.nombre as vendedor 
-             FROM productos p 
-             LEFT JOIN usuarios u ON p.vendedor_id = u.id 
-             WHERE p.id = ?`,
-            [req.params.id]
-        );
-        if (!rows.length) return res.status(404).json({ error: 'Producto no encontrado' });
-        res.json(rows[0]);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error servidor' });
@@ -57,46 +39,3 @@ router.post('/', auth(['Administrador']), async (req, res) => {
         res.status(500).json({ error: 'Error servidor' });
     }
 });
-
-// Actualizar producto (solo dueño y admin)
-router.put('/:id', auth(['Administrador']), async (req, res) => {
-    try {
-        const productId = req.params.id;
-        const vendedorId = req.user.id;
-
-        const [found] = await pool.execute('SELECT vendedor_id FROM productos WHERE id = ?', [productId]);
-        if (!found.length) return res.status(404).json({ error: 'Producto no existe' });
-        if (found[0].vendedor_id !== vendedorId) return res.status(403).json({ error: 'No autorizado' });
-
-        const { nombre, descripcion, precio, stock, imagen_url } = req.body;
-        await pool.execute(
-            `UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen_url = ? WHERE id = ?`,
-            [nombre, descripcion, precio, stock, imagen_url, productId]
-        );
-
-        res.json({ message: 'Producto actualizado' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error servidor' });
-    }
-});
-
-// Eliminar producto (solo dueño y admin)
-router.delete('/:id', auth(['Administrador']), async (req, res) => {
-    try {
-        const productId = req.params.id;
-        const vendedorId = req.user.id;
-
-        const [found] = await pool.execute('SELECT vendedor_id FROM productos WHERE id = ?', [productId]);
-        if (!found.length) return res.status(404).json({ error: 'Producto no existe' });
-        if (found[0].vendedor_id !== vendedorId) return res.status(403).json({ error: 'No autorizado' });
-
-        await pool.execute('DELETE FROM productos WHERE id = ?', [productId]);
-        res.json({ message: 'Producto eliminado' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error servidor' });
-    }
-});
-
-module.exports = router;

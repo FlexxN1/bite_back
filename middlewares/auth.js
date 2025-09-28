@@ -10,18 +10,16 @@ module.exports = function (allowedRoles = []) {
 
             const token = header.split(' ')[1];
             const payload = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = payload; // { id, nombre, email, tipo_usuario }
 
-            req.user = payload; // { id, tipo_usuario, nombre }
-
-            if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
-                if (!allowedRoles.includes(payload.tipo_usuario)) {
-                    return res.status(403).json({ error: 'Acceso denegado' });
-                }
+            // validar roles
+            if (allowedRoles.length > 0 && !allowedRoles.includes(payload.tipo_usuario)) {
+                return res.status(403).json({ error: 'Acceso denegado' });
             }
 
             next();
         } catch (err) {
-            console.error("❌ Error en middleware auth:", err);
+            console.error("❌ Error auth middleware:", err.message);
             return res.status(401).json({ error: 'Token inválido' });
         }
     };
