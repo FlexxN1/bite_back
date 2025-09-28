@@ -9,20 +9,6 @@ import "../style/Header.scss";
 
 const productos = { "productos": [] };
 
-// Generar hasta id: 60
-for (let i = 3; i <= 60; i++) {
-    productos.productos.push({
-        id: i,
-        nombre: `Aguacate Especial ${i}`,
-        descripcion: `Variedad especial número ${i}, de excelente calidad`,
-        precio: `${3000 + (i * 10)}.00`,
-        imagen_url: `https://example.com/imagenes/aguacate_${i}.jpg`,
-        stock: 50 + (i % 20),
-        vendedor_id: i,
-        fecha_creacion: "2025-09-25T01:56:41.000Z"
-    });
-}
-
 const ProductList = () => {
     const { products, loading } = useGetProducts(productos);
 
