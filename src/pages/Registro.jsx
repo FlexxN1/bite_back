@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../style/registro.scss";
 import logo from "@assets/logo.png";
-import { toast } from "../utils/toast"; // 👈 importamos el helper
+import { toast } from "../utils/toast";
 import { API_URL } from "../config";
+import AppContext from "@context/AppContext";
 
 export default function Registro() {
+    const { login } = useContext(AppContext);
     const navigate = useNavigate();
+
     const [nombre, setNombre] = useState("");
     const [correo, setCorreo] = useState("");
     const [password, setPassword] = useState("");
@@ -40,14 +43,20 @@ export default function Registro() {
 
             const data = await response.json();
 
-            if (response.ok) {
+            if (response.ok && data.accessToken && data.refreshToken && data.user) {
+                // ✅ Guardar tokens + usuario en contexto y localStorage
+                login({
+                    user: data.user,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                });
+
                 toast.fire({
                     icon: "success",
                     title: "✅ Registro exitoso",
                 });
 
-                setTimeout(() => navigate("/login"), 1500);
-                console.log("Usuario registrado:", data);
+                setTimeout(() => navigate("/perfil"), 1200);
             } else {
                 toast.fire({
                     icon: "error",

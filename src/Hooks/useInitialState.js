@@ -9,10 +9,11 @@ const useInitialState = () => {
 
     // Revisar si ya había sesión guardada
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
         const savedUser = localStorage.getItem("userData");
 
-        if (token && savedUser) {
+        if (accessToken && refreshToken && savedUser) {
             setUser(JSON.parse(savedUser));
         } else {
             setUser(null); // 👈 sin sesión
@@ -35,14 +36,20 @@ const useInitialState = () => {
     };
 
     // funciones de sesión
-    const login = (data) => {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userData", JSON.stringify(data));
-        setUser(data);
+    const login = ({ user, accessToken, refreshToken }) => {
+        if (accessToken) {
+            localStorage.setItem("accessToken", accessToken);
+        }
+        if (refreshToken) {
+            localStorage.setItem("refreshToken", refreshToken);
+        }
+        localStorage.setItem("userData", JSON.stringify(user));
+        setUser(user);
     };
 
     const logout = () => {
-        localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("userData");
         setUser(null);
         setState({ cart: [] }); // vaciar carrito

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../style/login.scss";
 import logo from "@assets/logo.png";
 import { API_URL } from "../config";
-import AppContext from "@context/AppContext"; // 👈 faltaba esto
+import AppContext from "@context/AppContext";
 import { toast } from "../utils/toast";
 
 export default function Login() {
@@ -26,11 +26,13 @@ export default function Login() {
 
             const data = await response.json();
 
-            if (response.ok) {
-                if (data.token && data.user) {
-                    const userData = { ...data.user, token: data.token };
-                    login(userData); // guarda en contexto y localStorage
-                }
+            if (response.ok && data.accessToken && data.refreshToken && data.user) {
+                // ✅ Guardar tokens + usuario en contexto y localStorage
+                login({
+                    user: data.user,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                });
 
                 toast.fire({
                     icon: "success",
@@ -38,7 +40,6 @@ export default function Login() {
                 });
 
                 setTimeout(() => navigate("/perfil"), 1200);
-                console.log("Usuario:", data);
             } else {
                 toast.fire({
                     icon: "error",

@@ -1,12 +1,12 @@
 import React, { useContext, useState } from "react";
-import "../style/adminPanel.scss"
+import "../style/adminPanel.scss";
 import { useNavigate } from "react-router-dom";
 import AdminPanel from "@components/AdminPanel";
 import UserPanel from "@components/UserPanel";
 import "../style/perfil.scss";
 import AppContext from "@context/AppContext";
-import { API_URL } from "../config";
-import { toast } from "../utils/toast"; // 👈 usamos sweetalert helper
+import api from "../services/apiClient"; // 👈 usamos el cliente con refresh automático
+import { toast } from "../utils/toast";
 
 export default function Perfil() {
     const { user, logout, login } = useContext(AppContext);
@@ -34,41 +34,31 @@ export default function Perfil() {
         }
 
         try {
-            const response = await fetch(`${API_URL}/usuarios/${user.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-                body: JSON.stringify({
-                    nombre,
-                    password: password || undefined,
-                    email: user.email,
-                    tipo_usuario: user.tipo_usuario,
-                }),
+            const response = await api.put(`/usuarios/${user.id}`, {
+                nombre,
+                password: password || undefined,
+                email: user.email,
+                tipo_usuario: user.tipo_usuario,
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
+            if (response.data?.user) {
                 toast.fire({ icon: "success", title: "✅ Perfil actualizado" });
 
-                login({ ...data.user, token: localStorage.getItem("token") });
+                // 🔥 Actualizar user en contexto
+                login(response.data.user, {
+                    accessToken: localStorage.getItem("accessToken"),
+                    refreshToken: localStorage.getItem("refreshToken"),
+                });
 
                 setEditMode(false);
                 setPassword("");
                 setConfirmar("");
-            } else {
-                toast.fire({
-                    icon: "error",
-                    title: `❌ ${data.error || "No se pudo actualizar"}`,
-                });
             }
         } catch (err) {
-            console.error("Error al actualizar perfil:", err);
+            console.error("❌ Error al actualizar perfil:", err);
             toast.fire({
                 icon: "error",
-                title: "❌ Error en el servidor",
+                title: "❌ No se pudo actualizar",
             });
         }
     };
@@ -85,9 +75,9 @@ export default function Perfil() {
                         <p><strong>Tipo:</strong> {user.tipo_usuario}</p>
                     </div>
 
-                    {/* 👉 Aquí ya se renderiza según el tipo de usuario */}
+                    {/* 👉 Render según el tipo de usuario */}
                     {user.tipo_usuario === "Administrador" ? (
-                        <AdminPanel user={user} />
+                        <AdminPanel />
                     ) : (
                         <UserPanel user={user} />
                     )}

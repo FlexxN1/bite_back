@@ -4,9 +4,12 @@ import ProductDetail from '@components/ProductDetail';
 import SkeletonProduct from '@components/SkeletonProduct';
 import useGetProducts from '../Hooks/useGetProducts';
 import Loader from '@components/Loader';
+import io from "socket.io-client";   // 👈 importar socket
+import { API_URL } from "../config"; // usa tu config centralizada
 import '../style/ProductList.scss';
 import "../style/Header.scss";
 
+const socket = io(API_URL); // 👈 conectar al backend con websockets
 
 const ProductList = () => {
     const { products, loading } = useGetProducts();
@@ -59,6 +62,21 @@ const ProductList = () => {
         }, 2000);
     };
 
+    // 🔥 Websocket: escuchar actualizaciones de stock
+    useEffect(() => {
+        socket.on("stockActualizado", ({ productoId, nuevoStock }) => {
+            setVisibleProducts(prev =>
+                prev.map(p =>
+                    p.id === productoId ? { ...p, stock: nuevoStock } : p
+                )
+            );
+        });
+
+        return () => {
+            socket.off("stockActualizado");
+        };
+    }, []);
+
     return (
         <section className="main-container">
             {loading ? (
@@ -92,15 +110,15 @@ const ProductList = () => {
                     </div>
 
                     {/* loader de scroll infinito */}
-                        <div ref={loaderRef} className="infinite-loader">
-                            {loadingMore ? (
-                                <p className="loading-text">Cargando más productos...</p>
-                            ) : visibleProducts.length < products.length ? (
-                                <p className="scroll-hint">Desliza para cargar más productos</p>
-                            ) : (
-                                <p className="no-more">No hay más productos</p>
-                            )}
-                        </div>
+                    <div ref={loaderRef} className="infinite-loader">
+                        {loadingMore ? (
+                            <p className="loading-text">Cargando más productos...</p>
+                        ) : visibleProducts.length < products.length ? (
+                            <p className="scroll-hint">Desliza para cargar más productos</p>
+                        ) : (
+                            <p className="no-more">No hay más productos</p>
+                        )}
+                    </div>
                     {selectedProduct && (
                         <ProductDetail
                             product={selectedProduct}
