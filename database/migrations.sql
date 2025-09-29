@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS compras (
     ciudad VARCHAR(100) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
+    metodo_pago ENUM('tarjeta', 'debito', 'contraentrega', 'nequi') NOT NULL DEFAULT 'tarjeta',
     estado_pago ENUM('pendiente', 'pagado', 'cancelado') DEFAULT 'pendiente',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );

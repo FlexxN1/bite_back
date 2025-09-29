@@ -123,7 +123,7 @@ export default function AdminPanel({ user }) {
     // ================================
     const cambiarEstadoEnvio = async (detalleId, nuevoEstado) => {
         try {
-            const res = await fetch(`${API_URL}/detalle-compras/${detalleId}/estado`, {
+            const res = await fetch(`${API_URL}/compras/detalle/${detalleId}/estado-envio`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ estado_envio: nuevoEstado }),

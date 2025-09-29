@@ -13,7 +13,7 @@ const Checkout = () => {
         direccion: "",
         ciudad: "",
         telefono: "",
-        metodoPago: "tarjeta",
+        metodo_pago: "tarjeta",
     });
 
     const handleChange = (e) => {
@@ -52,7 +52,7 @@ const Checkout = () => {
             telefono: formData.telefono,
             estado_pago: estadoPagoInicial, // 👈 ahora se guarda en estado_pago
             estado_envio: "Pendiente", // 👈 siempre inicia en Pendiente
-            metodoPago: formData.metodoPago,
+            metodo_pago: formData.metodo_pago,
             productos: state.cart,
         };
 
@@ -164,8 +164,8 @@ const Checkout = () => {
                 <label>
                     Método de Pago:
                     <select
-                        name="metodoPago"
-                        value={formData.metodoPago}
+                        name="metodo_pago"
+                        value={formData.metodo_pago}
                         onChange={handleChange}
                     >
                         <option value="tarjeta">Tarjeta de crédito</option>
