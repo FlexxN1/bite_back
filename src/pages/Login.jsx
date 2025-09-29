@@ -1,10 +1,10 @@
-import React, { useState, useContext} from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../style/login.scss";
 import logo from "@assets/logo.png";
 import { API_URL } from "../config";
-import AppContext from "@context/AppContext";
-import { toast } from "../utils/toast"; // 👈 importamos el helper
+import AppContext from "@context/AppContext"; // 👈 faltaba esto
+import { toast } from "../utils/toast";
 
 export default function Login() {
     const { login } = useContext(AppContext);
@@ -28,14 +28,16 @@ export default function Login() {
 
             if (response.ok) {
                 if (data.token && data.user) {
-                    login({ ...data.user, token: data.token }); // 👈 actualiza user en el contexto
+                    const userData = { ...data.user, token: data.token };
+                    login(userData); // guarda en contexto y localStorage
                 }
+
                 toast.fire({
                     icon: "success",
                     title: "✅ Inicio de sesión exitoso",
                 });
-                setTimeout(() => navigate("/perfil"), 1200); 
 
+                setTimeout(() => navigate("/perfil"), 1200);
                 console.log("Usuario:", data);
             } else {
                 toast.fire({

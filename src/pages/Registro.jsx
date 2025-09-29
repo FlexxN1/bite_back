@@ -34,7 +34,7 @@ export default function Registro() {
                     nombre,
                     email: correo,
                     password,
-                    tipoUsuario,
+                    tipo_usuario: tipoUsuario,
                 }),
             });
 
@@ -110,7 +110,7 @@ export default function Registro() {
                     required
                 >
                     <option value="">Selecciona tipo de Usuario</option>
-                    <option value="Usuario">Usuario</option>
+                    <option value="Cliente">Usuario</option>
                     <option value="Administrador">Administrador</option>
                 </select>
 

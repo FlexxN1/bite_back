@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AppContext from "@context/AppContext";
 import "../style/checkout.scss";
+import { API_URL } from "../config";
 
 const Checkout = () => {
     const { state, user } = useContext(AppContext);
@@ -34,24 +35,47 @@ const Checkout = () => {
             return;
         }
 
+        // 🔑 Definir estado_pago según el método de pago
+        let estadoPagoInicial = "pendiente";
+
+        if (formData.metodoPago === "contraentrega") {
+            estadoPagoInicial = "pendiente"; // admin lo marca después
+        } else {
+            estadoPagoInicial = "pagado"; // simulamos confirmación inmediata
+        }
+
         const order = {
             usuario_id: user?.id || 1,
-            productos: state.cart,
             total: sumTotal(),
-            ...formData,
+            ciudad: formData.ciudad,
+            direccion: formData.direccion,
+            telefono: formData.telefono,
+            estado_pago: estadoPagoInicial, // 👈 ahora se guarda en estado_pago
+            estado_envio: "Pendiente", // 👈 siempre inicia en Pendiente
+            metodoPago: formData.metodoPago,
+            productos: state.cart,
         };
 
         try {
-            console.log("Orden enviada:", order);
+            const res = await fetch(`${API_URL}/compras`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(order),
+            });
 
-            // Redirigir al perfil tras comprar
+            if (!res.ok) throw new Error("Error en la compra");
+
+            const data = await res.json();
+            console.log("Compra registrada:", data);
+
             alert(`✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
                 style: "currency",
                 currency: "COP",
             })}`);
+
             navigate("/perfil");
         } catch (error) {
-            console.error("Error en el checkout:", error);
+            console.error("Error en checkout:", error);
             alert("❌ Hubo un problema con la compra.");
         }
     };
