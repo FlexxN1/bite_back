@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useContext } from 'react';
 import OrderItem from './OrderItem';
 import '../style/MyOrder.scss';
+import { toast } from "../utils/toast.js"
 import iconArrow from '@assets/flechita.svg';
 import AppContext from '@context/AppContext';
 
@@ -18,7 +19,7 @@ const MyOrder = ({ toggleOrders, setToggleOrders }) => {
 
     const handleCheckout = () => {
         if (!user) {
-            alert("⚠️ Debes iniciar sesión o registrarte para poder comprar.");
+            toast.fire({ icon: "error", title: "⚠️ Debes iniciar sesión o registrarte para poder comprar." })
             navigate("/login");
             return;
         }

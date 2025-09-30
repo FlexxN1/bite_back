@@ -3,7 +3,7 @@ import '../style/ProductItem.scss';
 import AppContext from '@context/AppContext';
 import addToCartImage from '../assets/bt_add_to_cart.svg';
 import addedToCartImage from '../assets/bt_added_to_cart.svg';
-import img from "../assets/img.png";
+import img from "../assets/errorImg.jpg";
 import imgError from "../assets/errorImg.jpg";
 
 const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AppContext from "@context/AppContext";
 import api from "../services/apiClient"; // 👈 cliente con refresh automático
-import { API_URL } from "../config";
+import { API_URL, cloudName, uploadPreset } from "../config";
 import { toast } from "../utils/toast";
+
+
 
 export default function AdminPanel() {
     const { user } = useContext(AppContext); // 👈 sacamos user desde contexto
@@ -13,7 +15,7 @@ export default function AdminPanel() {
     const [precio, setPrecio] = useState("");
     const [stock, setStock] = useState("");
     const [imagenUrl, setImagenUrl] = useState("");
-
+    const [subiendo, setSubiendo] = useState(false); // 👈 estado del spinner
     const [productos, setProductos] = useState([]);
     const [compras, setCompras] = useState([]);
 
@@ -99,38 +101,8 @@ export default function AdminPanel() {
         if (user?.id) fetchCompras();
     }, [user?.id]);
 
-    // ================================
-    // Crear producto
-    // ================================
-    const crearProducto = async (e) => {
-        e.preventDefault();
-        try {
-            const { data } = await api.post("/productos-auth", {
-                nombre,
-                descripcion,
-                precio,
-                stock,
-                imagen_url: imagenUrl,
-            });
-
-            toast.fire({ icon: "success", title: "✅ Producto creado correctamente" });
-
-            // 🔥 data ya viene con todos los campos (id, nombre, descripcion, precio, stock, etc.)
-            setProductos((prev) => [...prev, data]);
-
-            // limpiar inputs
-            setNombre("");
-            setDescripcion("");
-            setPrecio("");
-            setStock("");
-            setImagenUrl("");
-        } catch (err) {
-            console.error(err);
-            toast.fire({ icon: "error", title: "❌ Error al crear producto" });
-        }
-    };
-
-
+    
+    
     // ================================
     // Eliminar producto
     // ================================
@@ -163,6 +135,76 @@ export default function AdminPanel() {
         }
     };
 
+    // ================================
+    // Subir imagen a Cloudinary con spinner
+    // ================================
+    const uploadImage = async (file) => {
+        setSubiendo(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", uploadPreset);
+
+            const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                { method: "POST", body: formData }
+            );
+
+            const data = await res.json();
+            setImagenUrl(data.secure_url);
+            toast.fire({ icon: "success", title: "✅ Imagen subida correctamente" });
+        } catch (err) {
+            console.error("❌ Error subiendo imagen:", err);
+            toast.fire({ icon: "error", title: "❌ No se pudo subir la imagen" });
+        } finally {
+            setSubiendo(false); // ✅ apaga el spinner siempre
+        }
+    };
+
+    
+    // ================================
+    // Crear producto
+    // ================================
+    const crearProducto = async (e) => {
+        e.preventDefault();
+
+        if (!nombre || !descripcion || !precio || !stock) {
+            toast.fire({ icon: "warning", title: "⚠️ Completa todos los campos" });
+            return;
+        }
+        if (!imagenUrl) {
+            toast.fire({ icon: "warning", title: "⚠️ Debes subir una imagen" });
+            return;
+        }
+        if (subiendo) {
+            toast.fire({ icon: "info", title: "⏳ Espera a que la imagen termine de subir" });
+            return;
+        }
+
+        try {
+            const { data } = await api.post("/productos-auth", {
+                nombre,
+                descripcion,
+                precio,
+                stock,
+                imagen_url: imagenUrl,
+            });
+
+            toast.fire({ icon: "success", title: "✅ Producto creado correctamente" });
+            setProductos((prev) => [...prev, data]);
+
+            // limpiar inputs
+            setNombre("");
+            setDescripcion("");
+            setPrecio("");
+            setStock("");
+            setImagenUrl("");
+        } catch (err) {
+            console.error(err);
+            toast.fire({ icon: "error", title: "❌ Error al crear producto" });
+        }
+    };
+    
     return (
         <div className="admin-layout">
             {/* =======================
@@ -215,36 +257,58 @@ export default function AdminPanel() {
                         placeholder="Nombre del producto"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
-                        required
+                        
                     />
                     <textarea
                         placeholder="Descripción"
                         value={descripcion}
                         onChange={(e) => setDescripcion(e.target.value)}
-                        required
+                        
                     />
                     <input
                         type="number"
                         placeholder="Precio"
                         value={precio}
                         onChange={(e) => setPrecio(e.target.value)}
-                        required
+                        
                     />
                     <input
                         type="number"
                         placeholder="Stock"
                         value={stock}
                         onChange={(e) => setStock(e.target.value)}
-                        required
+                        
                     />
-                    <input
-                        type="text"
-                        placeholder="URL de la imagen"
-                        value={imagenUrl}
-                        onChange={(e) => setImagenUrl(e.target.value)}
-                    />
-                    <button type="submit" className="btn-primary">
-                        Publicar producto
+
+                    {/* 👇 Botón estilizado para subir archivo */}
+                    <label className="upload-btn">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) uploadImage(file);
+                            }}
+                        />
+                        {subiendo ? "⏳ Subiendo..." : "📷 Seleccionar imagen"}
+                    </label>
+
+                    {/* 👀 Spinner o preview */}
+                    <div className="preview-area">
+                        {subiendo && <div className="spinner"></div>}
+                        {imagenUrl && !subiendo && (
+                            <img src={imagenUrl} alt="Vista previa" />
+                        )}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn-primary"
+                        disabled={subiendo
+                        }
+                    >
+                        {subiendo ? "Cargando..." : "Publicar producto"}
                     </button>
                 </form>
             </div>

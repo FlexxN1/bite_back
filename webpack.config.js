@@ -59,7 +59,9 @@ module.exports = {
             filename: '[name].css'
         }),
         new webpack.DefinePlugin({
-            "process.env.REACT_APP_API_URL": JSON.stringify(process.env.REACT_APP_API_URL || "http://localhost:3000")
+            "process.env.REACT_APP_API_URL": JSON.stringify(process.env.REACT_APP_API_URL || "http://localhost:3000"),
+            "process.env.REACT_APP_CLOUDINARY_CLOUD_NAME": JSON.stringify(process.env.REACT_APP_CLOUDINARY_CLOUD_NAME),
+            "process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET": JSON.stringify(process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET),
         })
     ],
     devServer: {

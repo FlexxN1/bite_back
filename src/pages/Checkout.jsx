@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppContext from "@context/AppContext";
+import { toast } from "../utils/toast";
 import "../style/checkout.scss";
 import { API_URL } from "../config";
 
@@ -72,10 +73,11 @@ const Checkout = () => {
             const data = await res.json();
             console.log("Compra registrada:", data);
 
-            alert(`✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
-                style: "currency",
-                currency: "COP",
-            })}`);
+            toast.fire({
+                icon: "success", title: `✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                })}`})
 
             navigate("/perfil");
         } catch (error) {

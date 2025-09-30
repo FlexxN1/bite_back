@@ -14,10 +14,16 @@ const useInitialState = () => {
         const refreshToken = localStorage.getItem("refreshToken");
         const savedUser = localStorage.getItem("userData");
 
-        if (accessToken && refreshToken && savedUser) {
-            setUser(JSON.parse(savedUser));
-        } else {
-            setUser(null); // 👈 sin sesión
+        try {
+            if (accessToken && refreshToken && savedUser && savedUser !== "undefined") {
+                setUser(JSON.parse(savedUser));
+            } else {
+                setUser(null);
+            }
+        } catch (error) {
+            console.error("❌ Error al parsear userData:", error);
+            setUser(null);
+            localStorage.removeItem("userData"); // limpiar valor corrupto
         }
 
         const timer = setTimeout(() => setLoadingUser(false), 1000);

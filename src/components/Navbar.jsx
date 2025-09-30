@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import logo from "@assets/logo.png";
 import "../style/navbar.scss";
 import "../style/shoppingCartItem.scss";
@@ -19,12 +19,15 @@ export default function Navbar() {
         }
     };
 
+
     return (
         <>
             <header className="header">
                 <div className="container__header">
                     <div className="container__items--header">
-                        <img src={logo} alt="BiteBack Logo" />
+                        <Link to={"/"}>
+                            <img src={logo} alt="BiteBack Logo"/>
+                        </Link>
                         <h1>BiteBack</h1>
                     </div>
 
