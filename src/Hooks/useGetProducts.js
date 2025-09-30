@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {API_URL} from "../config"
+import api from "../services/apiClient";
 
 const useGetProducts = () => {
   const [products, setProducts] = useState([]);
@@ -8,14 +8,8 @@ const useGetProducts = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch(`${API_URL}/productos`);
-        const data = await response.json();
-
-        if (response.ok) {
-          setProducts(data || []);
-        } else {
-          console.error("❌ Error en respuesta del servidor:", data);
-        }
+        const response = await api.get("/productos"); // 👈 usa apiClient
+        setProducts(response.data || []);
       } catch (error) {
         console.error("❌ Error al obtener productos:", error);
       } finally {

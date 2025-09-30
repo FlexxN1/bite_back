@@ -8,7 +8,7 @@ import AppContext from '@context/AppContext';
 const MyOrder = ({ toggleOrders, setToggleOrders }) => {
     const { state, user } = useContext(AppContext);
     const navigate = useNavigate();
-    
+
 
     const sumTotal = () => {
         return state.cart.reduce((acc, product) => {

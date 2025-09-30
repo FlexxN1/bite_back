@@ -12,23 +12,30 @@ import useInitialState from '../Hooks/useInitialState';
 import Checkout from '../pages/Checkout';
 import AppContext from '@context/AppContext';
 import PrivateRoute from "@components/PrivateRoute";
+import FullLoader from "@components/FullLoader";
+
 
 import "../index.scss";
 
-
 export default function App() {
   const initialState = useInitialState();
+  const { loadingUser } = initialState; 
+
+  if (loadingUser) {
+    return <FullLoader />;
+  }
+
   return (
     <AppContext.Provider value={initialState}>
       <div className="app-container">
         <main>
           <Routes>
-            <Route path="/" element={<><Navbar/><Home/></>} />
+            <Route path="/" element={<><Navbar /><Home /></>} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/perfil" element={<PrivateRoute><Perfil/></PrivateRoute>} />
-            <Route path="/checkout" element={<PrivateRoute><Checkout/></PrivateRoute>} />
+            <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
+            <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
             <Route path="/products" element={<><Navbar /><Products /></>} />
           </Routes>
         </main>

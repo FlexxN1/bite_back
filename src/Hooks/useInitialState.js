@@ -6,6 +6,7 @@ const useInitialState = () => {
     });
 
     const [user, setUser] = useState(null);
+    const [loadingUser, setLoadingUser] = useState(true); // 👈 nuevo
 
     // Revisar si ya había sesión guardada
     useEffect(() => {
@@ -18,6 +19,9 @@ const useInitialState = () => {
         } else {
             setUser(null); // 👈 sin sesión
         }
+
+        const timer = setTimeout(() => setLoadingUser(false), 1000);
+        return () => clearTimeout(timer);
     }, []);
 
     // funciones de carrito
@@ -62,6 +66,7 @@ const useInitialState = () => {
         user,
         login,
         logout,
+        loadingUser, // 👈 lo devolvemos
     };
 };
 

@@ -169,7 +169,7 @@ export default function AdminPanel() {
                 Aside izquierdo: Órdenes
             ======================= */}
             <aside className="admin-orders">
-                <h3>Órdenes de usuarios</h3>
+                <h3>Ordenes de usuarios</h3>
                 {compras.length > 0 ? (
                     <ul>
                         {compras.map((c) =>

@@ -10,14 +10,17 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
     const { state, addToCart } = useContext(AppContext);
 
     const handleClick = (item) => {
-        if (!state.cart.includes(item)) {
+        if (!state.cart?.some(p => p.id === item.id)) {
             addToCart(item);
         }
     };
 
     const verifyAdded = (item) => {
-        return state.cart.includes(item) ? addedToCartImage : addToCartImage;
+        return state.cart?.some(p => p.id === item.id)
+            ? addedToCartImage
+            : addToCartImage;
     };
+
 
     return (
         <div className="ProductItem">

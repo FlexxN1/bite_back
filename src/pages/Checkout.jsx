@@ -59,9 +59,13 @@ const Checkout = () => {
         try {
             const res = await fetch(`${API_URL}/compras`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`, // 🔑 token
+                },
                 body: JSON.stringify(order),
             });
+
 
             if (!res.ok) throw new Error("Error en la compra");
 

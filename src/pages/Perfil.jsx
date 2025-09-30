@@ -134,6 +134,13 @@ export default function Perfil() {
             >
                 Cerrar sesión
             </button>
+            {/* 👉 Nuevo botón Ir a productos */}
+            <button
+                onClick={() => navigate("/products")}
+                className="btn-primary ir-productos"
+            >
+                Ir a productos
+            </button>
         </section>
     );
 }

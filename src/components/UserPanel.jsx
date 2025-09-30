@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { API_URL } from "../config";
 import "../style/usePanel.scss"
 import AppContext from "@context/AppContext";
+import { io } from "socket.io-client";
 
 export default function UserPanel({ user }) {
     const { logout } = useContext(AppContext);
@@ -16,7 +17,19 @@ export default function UserPanel({ user }) {
 
         const fetchCompras = async () => {
             try {
-                const res = await fetch(`${API_URL}/compras`);
+                const accessToken = localStorage.getItem("accessToken");
+
+                const res = await fetch(`${API_URL}/compras`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Error ${res.status}: ${res.statusText}`);
+                }
+
                 const data = await res.json();
 
                 const filtradas = data.filter(
@@ -34,7 +47,45 @@ export default function UserPanel({ user }) {
         fetchCompras();
     }, [user?.id]);
 
-    // 👇 Mostrar mientras no haya user.id
+    // 👇 Conectar socket y escuchar actualizaciones
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const token = localStorage.getItem("accessToken");
+
+        const socket = io(API_URL, {
+            auth: { token },
+        });
+
+        socket.on("connect", () => {
+            console.log("🟢 Conectado a WebSocket:", socket.id);
+        });
+
+        socket.on("estadoEnvioActualizado", (data) => {
+            console.log("📦 Estado de envío actualizado:", data);
+
+            // Actualizar estado local en compras
+            setCompras((prev) =>
+                prev.map((c) => ({
+                    ...c,
+                    productos: c.productos.map((p) =>
+                        p.detalle_id === data.detalleId
+                            ? { ...p, estado_envio: data.nuevoEstado }
+                            : p
+                    ),
+                }))
+            );
+        });
+
+        socket.on("disconnect", () => {
+            console.log("🔴 Socket desconectado");
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, [user?.id]);
+
     if (!user?.id) {
         return (
             <section className="user-panel p-4 bg-white rounded-xl shadow-md">
@@ -62,7 +113,7 @@ export default function UserPanel({ user }) {
                                 <h4>Productos:</h4>
                                 <ul>
                                     {c.productos?.map((p) => (
-                                        <li key={p.producto_id}>
+                                        <li key={p.detalle_id}>
                                             <span className="producto-nombre">{p.nombre}</span>
                                             <span className="producto-cantidad">(x{p.cantidad})</span>
                                             <span className="producto-precio"> - ${p.precio_unitario}</span>

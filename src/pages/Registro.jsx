@@ -43,12 +43,11 @@ export default function Registro() {
 
             const data = await response.json();
 
-            if (response.ok && data.accessToken && data.refreshToken && data.user) {
-                // ✅ Guardar tokens + usuario en contexto y localStorage
+            if (response.ok && data.user && data.token) {
                 login({
                     user: data.user,
-                    accessToken: data.accessToken,
-                    refreshToken: data.refreshToken,
+                    accessToken: data.token,
+                    refreshToken: data.token, // opcional si quieres duplicarlo
                 });
 
                 toast.fire({
@@ -63,6 +62,7 @@ export default function Registro() {
                     title: `❌ ${data.error || data.message || "Error desconocido"}`,
                 });
             }
+
         } catch (error) {
             console.error("Error al registrar usuario:", error);
             toast.fire({
