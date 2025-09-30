@@ -1,9 +1,15 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "../style/main.scss";
-import logo from "@assets/logo.png"
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../style/registro.scss";
+import logo from "@assets/logo.png";
+import { toast } from "../utils/toast";
+import { API_URL } from "../config";
+import AppContext from "@context/AppContext";
 
 export default function Registro() {
+    const { login } = useContext(AppContext);
+    const navigate = useNavigate();
+
     const [nombre, setNombre] = useState("");
     const [correo, setCorreo] = useState("");
     const [password, setPassword] = useState("");
@@ -14,12 +20,15 @@ export default function Registro() {
         e.preventDefault();
 
         if (password !== confirmar) {
-            alert("❌ Las contraseñas no coinciden");
+            toast.fire({
+                icon: "error",
+                title: "❌ Las contraseñas no coinciden",
+            });
             return;
         }
 
         try {
-            const response = await fetch("https://webhook.latenode.com/79099/prod/7f81d6f6-303e-4e2b-9e51-02184a5f6d78", {
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -28,36 +37,49 @@ export default function Registro() {
                     nombre,
                     email: correo,
                     password,
-                    tipoUsuario,
+                    tipo_usuario: tipoUsuario,
                 }),
             });
 
             const data = await response.json();
 
-            if (response.ok) {
-                alert("✅ Registro exitoso");
-                console.log("Usuario registrado:", data);
+            if (response.ok && data.user && data.token) {
+                login({
+                    user: data.user,
+                    accessToken: data.token,
+                    refreshToken: data.token, // opcional si quieres duplicarlo
+                });
+
+                toast.fire({
+                    icon: "success",
+                    title: "✅ Registro exitoso",
+                });
+
+                setTimeout(() => navigate("/perfil"), 1200);
             } else {
-                alert("❌ Error: " + data.message);
+                toast.fire({
+                    icon: "error",
+                    title: `❌ ${data.error || data.message || "Error desconocido"}`,
+                });
             }
+
         } catch (error) {
             console.error("Error al registrar usuario:", error);
-            alert("❌ Error en el servidor");
+            toast.fire({
+                icon: "error",
+                title: "❌ Error en el servidor",
+            });
         }
     };
 
     return (
-        <section className="form-container">
-            <div className="form-header">
-                <img
-                    src={logo}
-                    alt="BiteBack Logo"
-                    className="form-logo"
-                />
+        <section className="form-container-registro">
+            <div className="form-header-registro">
+                <img src={logo} alt="BiteBack Logo" className="form-logo" />
                 <h2>Registro de Usuario</h2>
             </div>
 
-            <form id="formRegistro" onSubmit={handleSubmit}>
+            <form id="formRegistro" className="form-registro" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     id="Nombre"
@@ -97,22 +119,25 @@ export default function Registro() {
                     required
                 >
                     <option value="">Selecciona tipo de Usuario</option>
-                    <option value="Usuario">Usuario</option>
+                    <option value="Cliente">Usuario</option>
                     <option value="Administrador">Administrador</option>
                 </select>
+
                 <button type="submit">Registrarse</button>
             </form>
 
-            <p>
-                <Link to="/login" className="btn-primary">
-                    Iniciar sesión
-                </Link>
-            </p>
-            <p>
-                <Link to="/" className="btn-secondary">
-                    Volver
-                </Link>
-            </p>
+            <div className="form-registro-links">
+                <p>
+                    <Link to="/login" className="btn-primary">
+                        Iniciar sesión
+                    </Link>
+                </p>
+                <p>
+                    <Link to="/" className="btn-secondary">
+                        Volver
+                    </Link>
+                </p>
+            </div>
         </section>
     );
 }

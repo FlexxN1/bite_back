@@ -1,13 +1,21 @@
 .header {
-    background: transparent;
-    height: auto;
+    background: #008000;
     min-height: 80px;
-    display: flex;
     padding: 10px;
+    position: fixed;
+    width: 100%;
+    border-bottom: solid #556B2F;
+    top: 0;
+        left: 0;
+        right: 0;
+        height: 8rem;
+        z-index: 1000;
 }
 
 .container__header {
-    flex-wrap: wrap;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
     padding: 0 15px;
 }
 

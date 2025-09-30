@@ -1,0 +1,136 @@
+/* === LOGIN PAGE STYLES === */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2d572c, #4caf50);
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+    color: #fff;
+    text-align: center;
+}
+
+.form-header {
+    margin-bottom: 20px;
+}
+
+.form-logo {
+    max-width: 120px;
+}
+
+.form-container__form {
+    margin-bottom: 150px;
+    background: #ffffff;
+    color: #333;
+    padding: 35px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: fadeInUp 0.6s ease;
+}
+
+.form-container__form h2 {
+    margin-bottom: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2d572c;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form input {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+form input:focus {
+    border-color: #2d572c;
+    outline: none;
+    box-shadow: 0 0 8px rgba(45, 87, 44, 0.4);
+}
+
+.btn-primary {
+    background: #2d572c;
+    color: #fff !important;
+    border: none;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #256e25;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: 2px solid #2d572c;
+    color: #2d572c !important;
+    text-align: center;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-secondary:hover {
+    background: #2d572c;
+    color: #fff !important;
+}
+
+.form-container__form p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.form-container__form p a {
+    display: block;
+    margin-top: 8px;
+    text-decoration: none;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .form-container__form {
+        padding: 25px 20px;
+    }
+
+    .form-container__form h2 {
+        font-size: 1.6rem;
+    }
+}

@@ -1,4 +1,7 @@
-USE bkudmjj4rtn3guagaqw5;
+-- ======================================
+-- Usar base de datos
+-- ======================================
+USE bhc2g6pxbayk4bkibxfe;
 
 -- ======================================
 -- Tabla de usuarios (clientes y admins)
@@ -28,18 +31,23 @@ CREATE TABLE IF NOT EXISTS productos (
 );
 
 -- ======================================
--- Tabla de compras
+-- Tabla de compras (flujo de pago)
 -- ======================================
 CREATE TABLE IF NOT EXISTS compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL, -- el cliente que compra
     fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(10,2) NOT NULL,
+    ciudad VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20),
+    metodo_pago ENUM('tarjeta', 'debito', 'contraentrega', 'nequi') NOT NULL DEFAULT 'tarjeta',
+    estado_pago ENUM('pendiente', 'pagado', 'cancelado') DEFAULT 'pendiente',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- ======================================
--- Tabla detalle de compras
+-- Tabla detalle de compras (flujo logístico por producto)
 -- ======================================
 CREATE TABLE IF NOT EXISTS detalle_compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,6 +55,7 @@ CREATE TABLE IF NOT EXISTS detalle_compras (
     producto_id INT NOT NULL,
     cantidad INT NOT NULL DEFAULT 1,
     precio_unitario DECIMAL(10,2) NOT NULL,
+    estado_envio ENUM('Pendiente', 'En camino', 'Por llegar', 'Entregado') DEFAULT 'Pendiente',
     FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
 );
@@ -70,8 +79,9 @@ VALUES
 ('Aguacate Criollo', 'Pequeño pero muy sabroso', 3500, 50, 4, 'https://example.com/imagenes/aguacate_criollo.jpg');
 
 -- Ejemplo de compra
-INSERT INTO compras (usuario_id, total)
-VALUES (1, 2000);
+INSERT INTO compras (usuario_id, total, ciudad, direccion, telefono, estado_pago)
+VALUES (1, 20000, 'Bogotá', 'Calle 123 #45-67', '3001234567', 'pendiente');
 
-INSERT INTO detalle_compras (compra_id, producto_id, cantidad, precio_unitario)
-VALUES (1, 1, 1, 2000);
+-- Detalle de la compra con estado_envio
+INSERT INTO detalle_compras (compra_id, producto_id, cantidad, precio_unitario, estado_envio)
+VALUES (1, 2, 3, 3500, 'Pendiente');

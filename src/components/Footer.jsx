@@ -1,8 +1,9 @@
 import React from "react";
+import "../style/Footer.scss";
 
 export default function Footer() {
   return (
-    <footer className="text-center p-3 bg-dark text-light">
+    <footer className="footer">
       <small>&copy; 2025 BiteBack. Seguridad y confianza.</small>
     </footer>
   );

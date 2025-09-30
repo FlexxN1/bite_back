@@ -5,29 +5,37 @@ import Login from "@pages/Login";
 import Registro from "@pages/Registro";
 import Home from "@pages/Home";
 import Users from "@pages/Users";
-import Products from "@pages/Products";
+import Products from "@components/ProductList";
 import Perfil from "@pages/Perfil";
 import Navbar from '@components/Navbar';
-import useInitialState from '@hooks/useInitialState';
+import useInitialState from '../Hooks/useInitialState';
 import Checkout from '../pages/Checkout';
 import AppContext from '@context/AppContext';
+import PrivateRoute from "@components/PrivateRoute";
+import FullLoader from "@components/FullLoader";
+
 
 import "../index.scss";
 
-
 export default function App() {
   const initialState = useInitialState();
+  const { loadingUser } = initialState; 
+
+  if (loadingUser) {
+    return <FullLoader />;
+  }
+
   return (
     <AppContext.Provider value={initialState}>
       <div className="app-container">
         <main>
           <Routes>
-            <Route path="/" element={<><Navbar/><Home/></>} />
+            <Route path="/" element={<><Navbar /><Home /></>} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
+            <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
             <Route path="/products" element={<><Navbar /><Products /></>} />
           </Routes>
         </main>

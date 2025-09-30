@@ -1,0 +1,129 @@
+/* Fondo general */
+.form-container-registro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2d572c, #3d8a3d);
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+    color: #333;
+}
+
+/* Header con logo */
+.form-header-registro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    .form-logo {
+        width: 120px;
+        margin-bottom: 1rem;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        color: #fff;
+    }
+}
+
+/* Formulario */
+.form-registro {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    input,
+    select {
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fff;
+
+        &:focus {
+            border-color: #2d572c;
+            outline: none;
+            box-shadow: 0 0 8px rgba(45, 87, 44, 0.4);
+        }
+    }
+
+    button {
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: #2d572c;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease;
+
+        &:hover {
+            background: #256622;
+        }
+    }
+}
+
+/* Enlaces debajo */
+.form-registro-links {
+    margin-top: 1.5rem;
+    text-align: center;
+
+    p {
+        margin: 8px 0;
+
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #2d572c;
+            color: #fff;
+
+            &:hover {
+                background: #256622;
+            }
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+
+            &:hover {
+                background: #ddd;
+            }
+        }
+    }
+}
+
+.error-msg {
+    display: flex;
+    justify-content: center;
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.success-msg {
+    display: flex;
+    justify-content: center;
+    color: green;
+    margin-top: 10px;
+    font-weight: bold;
+}
