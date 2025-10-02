@@ -2,23 +2,19 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-top: 80px;
-    /* header */
+    padding-top: 8rem;
     padding-bottom: 60px;
-    /* footer */
     overflow-y: auto;
 }
 
 .ProductList {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 280px);
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    place-content: center;
-    margin: 3em 0 0 0;
+    padding-left: 50px;
     flex: 1;
 }
 
-/* 👇 Fade-in en cada producto */
 .fade-in {
     opacity: 0;
     transform: translateY(30px);
@@ -32,7 +28,6 @@
     }
 }
 
-/* 👇 Loader infinito */
 .infinite-loader {
     text-align: center;
     padding: 20px 0 40px;
@@ -57,7 +52,7 @@
     }
 }
 
-/* Skeleton shimmer (para lazy loading estilo FB/IG) */
+/* Skeleton shimmer (para lazy loading estilo) */
 .skeleton {
     animation: shimmer 1.5s infinite linear;
     background: linear-gradient(90deg,

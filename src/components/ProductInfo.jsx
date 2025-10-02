@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import '../style/ProductInfo.scss';
 import addToCartIcon from '../assets/bt_add_to_cart.svg';
 import AppContext from '@context/AppContext';
@@ -7,16 +7,19 @@ import img from "../assets/img.png";
 const ProductInfo = ({ product, setToggleProduct, setToggleOrders, isAdded }) => {
     const { state, addToCart } = useContext(AppContext);
 
+    const [cantidad, setCantidad] = useState(0);
+
     // Verifica si el producto ya está en el carrito
     const isInCart = state.cart.some(item => item.id === product.id);
 
     const handleAddToCart = () => {
-        if (!isInCart) {
-            addToCart(product); // lo agrega si no está
+        if (!isInCart && cantidad > 0 && cantidad <= product.stock) {
+            addToCart({ ...product, cantidad });
+            setToggleOrders(false);
         }
-        //setToggleProduct(false);  // cierra modal de producto
-        setToggleOrders(false);   // asegura que también se cierre MyOrder
     };
+
+    const isDisabled = isInCart || cantidad <= 0 || cantidad > product.stock;
 
     return (
         <>
@@ -29,17 +32,40 @@ const ProductInfo = ({ product, setToggleProduct, setToggleOrders, isAdded }) =>
                 <p className="price">${product.precio}</p>
                 <p className="name">{product.nombre}</p>
                 <p className="description">{product.descripcion}</p>
+                <p className="stock">Disponibles: {product.stock}</p>
 
-                {/* 👇 Nombre administrador hardcodeado */}
-                <p className="admin">Publicado por: <strong>Juan Pérez</strong></p>
+                {/* 👇 Nombre del vendedor */}
+                <p className="admin">
+                    Publicado por: <strong>{product.vendedor || "Administrador"}</strong>
+                </p>
+
+                {/* Selector de cantidad */}
+                <div className="quantity-selector">
+                    <label>Cantidad: </label>
+                    <input
+                        placeholder='Cantidad'
+                        className='btn-cantidad'
+                        type="number"
+                        min="1"
+                        max={product.stock}
+                        value={cantidad}
+                        onChange={(e) => setCantidad(Number(e.target.value))}
+                    />
+                </div>
 
                 <button
                     className={`primary-button add-to-cart-button ${isInCart ? "in-cart" : ""}`}
                     onClick={handleAddToCart}
-                    disabled={isInCart} // desactiva si ya está
+                    disabled={isDisabled}
                 >
-                    <img src={addToCartIcon} alt="add to cart" />
-                    {isAdded ? "Agregado al carrito" : "Agregar al carrito"}
+                    {isDisabled ? (
+                        isInCart ? "Agregado al carrito" : "Selecciona cantidad"
+                    ) : (
+                        <>
+                            <img src={addToCartIcon} alt="add to cart" />
+                            Agregar al carrito
+                        </>
+                    )}
                 </button>
             </div>
         </>

@@ -10,7 +10,7 @@ const OrderItem = ({ product }) => {
     return (
         <div className="OrderItem">
             <figure>
-                <img src={product.imageness_url || img_url} alt={product.nombre} />
+                <img src={product.imagen_url || img_url} alt={product.nombre} />
             </figure>
             <p>{product.nombre}</p>
             <p>${product.precio}</p>

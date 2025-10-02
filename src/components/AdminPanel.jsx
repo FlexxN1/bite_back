@@ -186,11 +186,18 @@ export default function AdminPanel() {
     // ================================
     // Crear producto
     // ================================
+    // ================================
+    // Crear producto
+    // ================================
     const crearProducto = async (e) => {
         e.preventDefault();
 
         if (!nombre || !descripcion || !precio || !stock) {
             toast.fire({ icon: "warning", title: "⚠️ Completa todos los campos" });
+            return;
+        }
+        if (Number(stock) <= 0) {
+            toast.fire({ icon: "error", title: "❌ El stock debe ser mayor" });
             return;
         }
         if (!imagenUrl) {
@@ -228,6 +235,7 @@ export default function AdminPanel() {
             setLoadingProductos(false);
         }
     };
+
 
     return (
         <div className="admin-layout">
