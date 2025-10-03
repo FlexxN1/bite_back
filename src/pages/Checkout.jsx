@@ -24,8 +24,12 @@ const Checkout = () => {
         });
     };
 
+    // ✅ Total con cantidades
     const sumTotal = () => {
-        return state.cart.reduce((acc, item) => acc + Number(item.precio || 0), 0);
+        return state.cart.reduce(
+            (acc, item) => acc + Number(item.precio || 0) * Number(item.cantidad || 1),
+            0
+        );
     };
 
     const handleSubmit = async (e) => {
@@ -39,7 +43,7 @@ const Checkout = () => {
         // 🔑 Definir estado_pago según el método de pago
         let estadoPagoInicial = "pendiente";
 
-        if (formData.metodoPago === "contraentrega") {
+        if (formData.metodo_pago === "contraentrega") {
             estadoPagoInicial = "pendiente"; // admin lo marca después
         } else {
             estadoPagoInicial = "pagado"; // simulamos confirmación inmediata
@@ -51,8 +55,8 @@ const Checkout = () => {
             ciudad: formData.ciudad,
             direccion: formData.direccion,
             telefono: formData.telefono,
-            estado_pago: estadoPagoInicial, // 👈 ahora se guarda en estado_pago
-            estado_envio: "Pendiente", // 👈 siempre inicia en Pendiente
+            estado_pago: estadoPagoInicial,
+            estado_envio: "Pendiente",
             metodo_pago: formData.metodo_pago,
             productos: state.cart,
         };
@@ -62,11 +66,10 @@ const Checkout = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`, // 🔑 token
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                 },
                 body: JSON.stringify(order),
             });
-
 
             if (!res.ok) throw new Error("Error en la compra");
 
@@ -74,10 +77,12 @@ const Checkout = () => {
             console.log("Compra registrada:", data);
 
             toast.fire({
-                icon: "success", title: `✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
+                icon: "success",
+                title: `✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
                     style: "currency",
                     currency: "COP",
-                })}`})
+                })}`,
+            });
 
             navigate("/perfil");
         } catch (error) {
@@ -99,9 +104,14 @@ const Checkout = () => {
                     <>
                         {state.cart.map((item) => (
                             <div key={item.id} className="checkout-item">
-                                <span>{item.nombre}</span>
                                 <span>
-                                    {Number(item.precio).toLocaleString("es-CO", {
+                                    {item.nombre}{" "}
+                                    <strong>x {item.cantidad || 1}</strong>
+                                </span>
+                                <span>
+                                    {(
+                                        Number(item.precio) * Number(item.cantidad || 1)
+                                    ).toLocaleString("es-CO", {
                                         style: "currency",
                                         currency: "COP",
                                     })}
@@ -181,7 +191,6 @@ const Checkout = () => {
                     </select>
                 </label>
 
-                {/* 👇 Botón bloqueado si no hay productos */}
                 <button
                     type="submit"
                     className="btn-primary"

@@ -4,21 +4,27 @@ import AppContext from '@context/AppContext';
 import addToCartImage from '../assets/bt_add_to_cart.svg';
 import addedToCartImage from '../assets/bt_added_to_cart.svg';
 import img from "../assets/errorImg.jpg";
-import imgAgotado from "../assets/pngwing.com.png"
 import imgError from "../assets/errorImg.jpg";
 
 const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
-    const { state, addToCart } = useContext(AppContext);
+    const { state, addToCart, updateCart } = useContext(AppContext);
     const [cantidad, setCantidad] = useState("");
 
+    const productoEnCarrito = state.cart.find(p => p.id === product.id);
+
     const handleClick = (item) => {
-        if (!state.cart?.some(p => p.id === item.id) && cantidad > 0) {
-            addToCart({ ...item, cantidad });
+        if (!productoEnCarrito && cantidad > 0) {
+            // 🚀 Si no está en el carrito, lo agrega
+            addToCart({ ...item, cantidad: Number(cantidad) });
+        } else if (productoEnCarrito && cantidad > 0) {
+            // 🚀 Si ya está, solo actualiza la cantidad
+            updateCart({ ...productoEnCarrito, cantidad: Number(cantidad) });
         }
     };
 
-    const verifyAdded = (item) => {
-        return state.cart?.some(p => p.id === item.id)
+    const verifyAdded = () => {
+        if (!productoEnCarrito) return addToCartImage;
+        return productoEnCarrito.cantidad === Number(cantidad)
             ? addedToCartImage
             : addToCartImage;
     };
@@ -34,16 +40,16 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
                     onClick={() => (isOpen ? closeProduct() : openProduct())}
                     onError={(e) => { e.target.src = imgError; }}
                 />
-                {product.stock === 0 && (
-                    <div className="overlay-agotado">
-                        <img src={imgAgotado} alt="Agotado" className="overlay-icon" />
-                    </div>
-                )}
             </div>
 
             <div className="product-info">
                 <div>
-                    <p>${product.precio}</p>
+                    <p>
+                        {Number(product.precio).toLocaleString("es-CO", {
+                            style: "currency",
+                            currency: "COP",
+                        })}
+                    </p>
                     <p>{product.nombre ? product.nombre.substring(0, 80) : "Sin nombre"}</p>
                     <p>Stock: {product.stock}</p>
 
@@ -67,7 +73,7 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
                         className={`add-to-cart-btn ${!cantidad ? "disabled" : ""}`}
                         onClick={() => handleClick(product)}
                     >
-                        <img src={verifyAdded(product)} alt={product.nombre} />
+                        <img src={verifyAdded()} alt={product.nombre} />
                     </figure>
                 )}
             </div>

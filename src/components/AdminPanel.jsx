@@ -260,7 +260,10 @@ export default function AdminPanel() {
                                     <p><strong>Teléfono:</strong> {c.telefono}</p>
                                     <p><strong>Fecha compra: </strong>{c.fecha_compra}</p>
                                     <p><strong>Cantidad:</strong> {p.cantidad}</p>
-                                    <p><strong>Total:</strong> 💲{p.precio_unitario * p.cantidad}</p>
+                                    <p><strong>Total:</strong> 💲 {Number(p.precio_unitario * p.cantidad).toLocaleString("es-CO", {
+                                        style: "currency",
+                                        currency: "COP",
+                                    })}</p>
                                     <p><strong>Estado de pago:</strong> {c.estado_pago}</p>
 
                                     <p><strong>Estado de envío:</strong></p>
@@ -371,7 +374,10 @@ export default function AdminPanel() {
                                 <div className="producto-info">
                                     <p><strong>{p.nombre}</strong></p>
                                     <p>{p.descripcion}</p>
-                                    <p>💲 {p.precio}</p>
+                                    <p>💲 {Number(p.precio).toLocaleString("es-CO", {
+                                        style: "currency",
+                                        currency: "COP",})}
+                                    </p>
                                     <p>Stock: {p.stock}</p>
                                     {p.imagen_url && (
                                         <img src={p.imagen_url} alt={p.nombre} />

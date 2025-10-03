@@ -34,39 +34,9 @@ const ProductInfo = ({ product, setToggleProduct, setToggleOrders, isAdded }) =>
                 <p className="description">{product.descripcion}</p>
                 <p className="stock">Disponibles: {product.stock}</p>
 
-                {/* 👇 Nombre del vendedor */}
                 <p className="admin">
                     Publicado por: <strong>{product.vendedor || "Administrador"}</strong>
                 </p>
-
-                {/* Selector de cantidad */}
-                <div className="quantity-selector">
-                    <label>Cantidad: </label>
-                    <input
-                        placeholder='Cantidad'
-                        className='btn-cantidad'
-                        type="number"
-                        min="1"
-                        max={product.stock}
-                        value={cantidad}
-                        onChange={(e) => setCantidad(Number(e.target.value))}
-                    />
-                </div>
-
-                <button
-                    className={`primary-button add-to-cart-button ${isInCart ? "in-cart" : ""}`}
-                    onClick={handleAddToCart}
-                    disabled={isDisabled}
-                >
-                    {isDisabled ? (
-                        isInCart ? "Agregado al carrito" : "Selecciona cantidad"
-                    ) : (
-                        <>
-                            <img src={addToCartIcon} alt="add to cart" />
-                            Agregar al carrito
-                        </>
-                    )}
-                </button>
             </div>
         </>
     );
