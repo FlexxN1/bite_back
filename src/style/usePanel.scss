@@ -23,7 +23,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    width: 900px;
+    width: 940px;
     height: 520px;
     overflow-y: scroll;
     gap: 1rem;
@@ -59,6 +59,8 @@
   border-radius: 10px;
   padding: 1rem;
   height: 200px;
+  overflow-y: scroll;
+  width: 300px;
   background: #fdfdfd;
   transition: all 0.2s ease;
 
