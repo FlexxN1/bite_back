@@ -12,13 +12,13 @@ export default function AdminPanel() {
     const [descripcion, setDescripcion] = useState("");
     const [precio, setPrecio] = useState("");
     const [stock, setStock] = useState("");
-    const [imagenUrl, setImagenUrl] = useState("");
-    const [subiendo, setSubiendo] = useState(false); // 👈 estado del spinner imagen
+    const [imagenes, setImagenes] = useState([]); // ✅ soporte múltiples imágenes
+    const [subiendo, setSubiendo] = useState(false);
     const [productos, setProductos] = useState([]);
     const [compras, setCompras] = useState([]);
 
-    const [loadingCompras, setLoadingCompras] = useState(false); // ⏳ loader aside izquierdo
-    const [loadingProductos, setLoadingProductos] = useState(false); // ⏳ loader aside derecho
+    const [loadingCompras, setLoadingCompras] = useState(false);
+    const [loadingProductos, setLoadingProductos] = useState(false);
 
     // ================================
     // WebSocket (Socket.IO)
@@ -48,7 +48,6 @@ export default function AdminPanel() {
             fetchCompras().finally(() => setLoadingCompras(false));
         });
 
-        // 👇 escuchar finalización
         socket.on("compraFinalizada", (data) => {
             setCompras((prev) => prev.filter((c) => c.compra_id !== data.compraId));
         });
@@ -56,9 +55,8 @@ export default function AdminPanel() {
         return () => socket.disconnect();
     }, []);
 
-
     // ================================
-    // Obtener productos del admin
+    // Obtener productos
     // ================================
     useEffect(() => {
         const fetchProductos = async () => {
@@ -76,14 +74,13 @@ export default function AdminPanel() {
     }, [user?.id]);
 
     // ================================
-    // Obtener compras (órdenes de usuarios)
+    // Obtener compras
     // ================================
     const fetchCompras = async () => {
         setLoadingCompras(true);
         try {
             const { data } = await api.get("/compras");
 
-            // ✅ Filtramos solo los productos NO entregados del admin actual
             const filtradas = data
                 .map((c) => ({
                     ...c,
@@ -91,7 +88,7 @@ export default function AdminPanel() {
                         (p) => p.vendedor_id === user.id && p.estado_envio !== "Entregado"
                     ),
                 }))
-                .filter((c) => c.productos.length > 0); // 👈 quitamos compras vacías
+                .filter((c) => c.productos.length > 0);
 
             setCompras(filtradas);
         } catch (err) {
@@ -124,9 +121,6 @@ export default function AdminPanel() {
     // ================================
     // Cambiar estado_envio
     // ================================
-    // ================================
-    // Cambiar estado_envio
-    // ================================
     const cambiarEstadoEnvio = async (detalleId, nuevoEstado) => {
         try {
             await api.put(`/compras/detalle/${detalleId}/estado-envio`, {
@@ -135,7 +129,6 @@ export default function AdminPanel() {
             toast.fire({ icon: "success", title: "✅ Estado de envío actualizado" });
 
             if (nuevoEstado === "Entregado") {
-                // 🗑️ eliminar orden entregada del listado local
                 setCompras((prev) =>
                     prev
                         .map((c) => ({
@@ -144,10 +137,9 @@ export default function AdminPanel() {
                                 (p) => p.detalle_id !== detalleId
                             ),
                         }))
-                        .filter((c) => c.productos.length > 0) // quitar compras vacías
+                        .filter((c) => c.productos.length > 0)
                 );
             } else {
-                // si no es entregado, refrescar lista normal
                 fetchCompras();
             }
         } catch (error) {
@@ -156,36 +148,35 @@ export default function AdminPanel() {
         }
     };
 
-
     // ================================
-    // Subir imagen a Cloudinary con spinner
+    // Subir imágenes múltiples
     // ================================
-    const uploadImage = async (file) => {
+    const uploadImages = async (files) => {
         setSubiendo(true);
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", uploadPreset);
+            const urls = [];
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", uploadPreset);
 
-            const res = await fetch(
-                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-                { method: "POST", body: formData }
-            );
-
-            const data = await res.json();
-            setImagenUrl(data.secure_url);
-            toast.fire({ icon: "success", title: "✅ Imagen subida correctamente" });
+                const res = await fetch(
+                    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                    { method: "POST", body: formData }
+                );
+                const data = await res.json();
+                urls.push(data.secure_url);
+            }
+            setImagenes((prev) => [...prev, ...urls]);
+            toast.fire({ icon: "success", title: "✅ Imagen(es) subida(s) correctamente" });
         } catch (err) {
-            console.error("❌ Error subiendo imagen:", err);
-            toast.fire({ icon: "error", title: "❌ No se pudo subir la imagen" });
+            console.error("❌ Error subiendo imágenes:", err);
+            toast.fire({ icon: "error", title: "❌ No se pudieron subir las imágenes" });
         } finally {
             setSubiendo(false);
         }
     };
 
-    // ================================
-    // Crear producto
-    // ================================
     // ================================
     // Crear producto
     // ================================
@@ -200,12 +191,12 @@ export default function AdminPanel() {
             toast.fire({ icon: "error", title: "❌ El stock debe ser mayor" });
             return;
         }
-        if (!imagenUrl) {
-            toast.fire({ icon: "warning", title: "⚠️ Debes subir una imagen" });
+        if (imagenes.length === 0) {
+            toast.fire({ icon: "warning", title: "⚠️ Debes subir al menos una imagen" });
             return;
         }
         if (subiendo) {
-            toast.fire({ icon: "info", title: "⏳ Espera a que la imagen termine de subir" });
+            toast.fire({ icon: "info", title: "⏳ Espera a que las imágenes terminen de subir" });
             return;
         }
 
@@ -217,31 +208,29 @@ export default function AdminPanel() {
                 descripcion,
                 precio,
                 stock,
-                imagen_url: imagenUrl,
+                imagenes, // ✅ array de imágenes
             });
 
             toast.fire({ icon: "success", title: "✅ Producto creado correctamente" });
             setProductos((prev) => [...prev, data]);
 
+            // Reset
             setNombre("");
             setDescripcion("");
             setPrecio("");
             setStock("");
-            setImagenUrl("");
+            setImagenes([]);
         } catch (err) {
-            console.error(err);
+            console.error("❌ Error creando producto:", err);
             toast.fire({ icon: "error", title: "❌ Error al crear producto" });
         } finally {
             setLoadingProductos(false);
         }
     };
 
-
     return (
         <div className="admin-layout">
-            {/* =======================
-                Aside izquierdo: Órdenes
-            ======================= */}
+            {/* Aside izquierdo */}
             <aside className="admin-orders">
                 <h3>Ordenes de usuarios</h3>
                 {loadingCompras ? (
@@ -265,7 +254,6 @@ export default function AdminPanel() {
                                         currency: "COP",
                                     })}</p>
                                     <p><strong>Estado de pago:</strong> {c.estado_pago}</p>
-
                                     <p><strong>Estado de envío:</strong></p>
                                     <select
                                         value={p.estado_envio || "Pendiente"}
@@ -287,9 +275,7 @@ export default function AdminPanel() {
                 )}
             </aside>
 
-            {/* =======================
-                Centro: Formulario
-            ======================= */}
+            {/* Centro: Formulario */}
             <div className="admin-panel">
                 <h3>Gestión de Productos</h3>
                 <form onSubmit={crearProducto}>
@@ -322,45 +308,57 @@ export default function AdminPanel() {
                             type="file"
                             accept="image/*"
                             hidden
+                            multiple // ✅ varias imágenes
                             onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) uploadImage(file);
+                                const files = Array.from(e.target.files);
+                                if (files.length > 0) uploadImages(files);
                             }}
                         />
-                        {subiendo ? "⏳ Subiendo..." : "📷 Seleccionar imagen"}
+                        {subiendo ? "⏳ Subiendo..." : "📷 Seleccionar imágenes"}
                     </label>
 
-                    {(subiendo || imagenUrl) && (
-                        <div className="preview-area">
-                            {subiendo && <div className="spinner"></div>}
+                    {(subiendo || imagenes.length > 0) && (
+                        <>
+                            <div className="preview-area">
+                                {subiendo && <div className="spinner"></div>}
 
-                            {imagenUrl && !subiendo && (
-                                <div className="preview-wrapper">
-                                    <img src={imagenUrl} alt="Vista previa" />
-                                    <button
-                                        type="button"
-                                        className="btn-remove-image"
-                                        onClick={() => setImagenUrl("")}
-                                    >
-                                        ✖
-                                    </button>
-                                </div>
-                            )}
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                                disabled={subiendo}
-                            >
-                                {subiendo ? "Cargando..." : "Publicar producto"}
-                            </button>
-                        </div>
+                                {imagenes.length > 0 && !subiendo && (
+                                    <div className="preview-multi">
+                                        {imagenes.map((img, idx) => (
+                                            <div className="preview-wrapper" key={idx}>
+                                                <img src={img} alt={`Vista previa ${idx}`} />
+                                                <button
+                                                    type="button"
+                                                    className="btn-remove-image"
+                                                    onClick={() =>
+                                                        setImagenes((prev) =>
+                                                            prev.filter((_, i) => i !== idx)
+                                                        )
+                                                    }
+                                                >
+                                                    ✖
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="container-btn__submit">
+
+                                <button
+                                    type="submit"
+                                    className="btn-primary"
+                                    disabled={subiendo}
+                                >
+                                    {subiendo ? "Cargando..." : "Publicar producto"}
+                                </button>
+                            </div>
+                        </>
                     )}
                 </form>
             </div>
 
-            {/* =======================
-                Aside derecho: Productos publicados
-            ======================= */}
+            {/* Aside derecho */}
             <aside className="admin-products">
                 <h3>Productos de {user?.nombre}</h3>
                 {loadingProductos ? (
@@ -376,12 +374,13 @@ export default function AdminPanel() {
                                     <p>{p.descripcion}</p>
                                     <p>💲 {Number(p.precio).toLocaleString("es-CO", {
                                         style: "currency",
-                                        currency: "COP",})}
-                                    </p>
+                                        currency: "COP",
+                                    })}</p>
                                     <p>Stock: {p.stock}</p>
-                                    {p.imagen_url && (
-                                        <img src={p.imagen_url} alt={p.nombre} />
-                                    )}
+                                    {/* ✅ múltiples imágenes */}
+                                    {p.imagenes?.map((img, idx) => (
+                                        <img key={idx} src={img} alt={`${p.nombre}-${idx}`} />
+                                    ))}
                                 </div>
                                 <button
                                     className="btn-delete"

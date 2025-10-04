@@ -1,30 +1,54 @@
 .productImage {
     cursor: pointer;
+        width: 100%;
+            height: 100%;
+            object-fit: cover;
     transition: opacity 0.3s ease;
 }
 
 .ProductItem {
     margin-top: 100px;
+    height: 428px;
     width: 240px;
     position: relative;
     background-color: #fdfdfd;
     border-bottom-right-radius: 15px;
     border-bottom-left-radius: 15px;
     box-shadow: -1px 5px 11px -1px rgba(0, 0, 0, 0.46);
-        -webkit-box-shadow: -1px 5px 11px -1px rgba(0, 0, 0, 0.46);
-        -moz-box-shadow: -1px 5px 11px -1px rgba(0, 0, 0, 0.46);
+    -webkit-box-shadow: -1px 5px 11px -1px rgba(0, 0, 0, 0.46);
+    -moz-box-shadow: -1px 5px 11px -1px rgba(0, 0, 0, 0.46);
 }
 
 .image-wrapper {
     position: relative;
     width: 100%;
     height: 240px;
+    overflow: hidden;
 }
 
-.ProductItem img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* ✅ Carousel botones */
+.carousel-btn__right, .carousel-btn__left {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.6);
+    /* semitransparente */
+    border: none;
+    font-size: 2rem;
+    height: 30px;
+    width: 40px;
+    color: #333;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.carousel-btn__left {
+    right: 0%;
+}
+.carousel-btn__right:hover, 
+.carousel-btn__left:hover {
+    background: rgba(255, 255, 255, 0.9);
 }
 
 /* ✅ Cuando está agotado */
@@ -52,7 +76,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 0 20px;
+    padding: 0 20px 20px 20px;
     margin-top: 12px;
 
     div {

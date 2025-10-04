@@ -107,7 +107,9 @@ export default function UserPanel({ user }) {
             <h3 className="user-panel__title">Historial de Compras</h3>
 
             {loading ? (
-                <p className="user-panel__loading">Cargando compras...</p>
+                <div className="user-panel__loading">
+                    <span className="user-panel__spinner"></span>
+                </div>
             ) : compras.length > 0 ? (
                         <ul className="user-panel__list">
                             {compras.map((c) => {

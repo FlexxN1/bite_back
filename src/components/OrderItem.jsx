@@ -17,7 +17,7 @@ const OrderItem = ({ product }) => {
     return (
         <div className="OrderItem">
             <figure>
-                <img src={product.imagen_url || img_url} alt={product.nombre} />
+                <img src={product.imagenes_producto[0] || img_url} alt={product.nombre} />
             </figure>
 
             <div className="order-info">

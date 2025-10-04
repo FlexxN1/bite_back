@@ -17,20 +17,22 @@ const ProductDetail = ({ product, setToggleProduct, handleClick }) => {
     };
 
     return (
-        <aside className="ProductDetail">
-            <div
-                className="ProductDetail-close"
-                onClick={() => setToggleProduct(false)}
-            >
-                <img src={iconClose} alt="close" />
-            </div>
+        <div className='container-modal'>
+            <aside className="ProductDetail">
+                <div
+                    className="ProductDetail-close"
+                    onClick={() => setToggleProduct(false)}
+                >
+                    <img src={iconClose} alt="close" />
+                </div>
 
-            <ProductInfo
-                product={product}
-                setToggleProduct={setToggleProduct}
-                handleClick={handleProtectedClick} // 👈 protegemos aquí
-            />
-        </aside>
+                <ProductInfo
+                    product={product}
+                    setToggleProduct={setToggleProduct}
+                    handleClick={handleProtectedClick} // 👈 protegemos aquí
+                />
+            </aside>
+        </div>
     );
 };
 

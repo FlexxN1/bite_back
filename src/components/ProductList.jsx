@@ -103,7 +103,7 @@ const ProductList = () => {
 
                             {loadingMore &&
                                 Array.from({ length: Math.min(8, products.length - visibleProducts.length) }).map((_, i) => (
-                                    <div key={`sk-load-${i}`} className="fade-in">
+                                    <div key={`sk-load-${i}`} className="">
                                         <SkeletonProduct />
                                     </div>
                                 ))}
