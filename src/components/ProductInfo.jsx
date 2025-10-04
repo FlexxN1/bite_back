@@ -26,7 +26,7 @@ const ProductInfo = ({ product }) => {
     return (
         <>
             <div className="carousel-wrapper__info">
-                {product.imagenes_producto && product.imagenes_producto.length > 0 ? (
+                {product.imagenes_producto && product.imagenes_producto ? (
                     <>
                         <img
                             src={product.imagenes_producto[currentIndex]}
@@ -54,7 +54,10 @@ const ProductInfo = ({ product }) => {
                 )}
             </div>
                 <div className="ProductInfo">
-                    <p className="price">${product.precio}</p>
+                <p className="price">{Number(product.precio).toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                })}</p>
                     <p className="name">{product.nombre}</p>
                     <p className="description">{product.descripcion}</p>
                     <p className="stock">Disponibles: {product.stock}</p>

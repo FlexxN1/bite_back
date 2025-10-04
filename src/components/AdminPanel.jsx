@@ -43,6 +43,17 @@ export default function AdminPanel() {
             );
         });
 
+        // 🆕 Actualización en tiempo real del pago
+        socket.on("estadoPagoActualizado", (data) => {
+            setCompras((prev) =>
+                prev.map((c) =>
+                    c.compra_id === Number(data.compraId)
+                        ? { ...c, estado_pago: data.estado_pago }
+                        : c
+                )
+            );
+        });
+
         socket.on("nuevaCompra", () => {
             setLoadingCompras(true);
             fetchCompras().finally(() => setLoadingCompras(false));

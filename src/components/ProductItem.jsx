@@ -55,7 +55,7 @@ const ProductItem = ({ product, isOpen, openProduct, closeProduct }) => {
                             onClick={() => (isOpen ? closeProduct() : openProduct())}
                             onError={(e) => { e.target.src = imgError; }}
                         />
-                        {product.imagenes_producto.length > 1 && (
+                        {product.imagenes_producto && (
                             <>
                                 <button onClick={prevImage} className="carousel-btn__right">
                                     <img src={btnRight} alt="Anterior" />
