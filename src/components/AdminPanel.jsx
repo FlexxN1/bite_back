@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AppContext from "@context/AppContext";
 import api from "../services/apiClient"; // 👈 cliente con refresh automático
-import { API_URL } from "../config";
+import { API_URL, cloudName, uploadPreset } from "../config";
 import { toast } from "../utils/toast";
 
 export default function AdminPanel() {
@@ -12,10 +12,13 @@ export default function AdminPanel() {
     const [descripcion, setDescripcion] = useState("");
     const [precio, setPrecio] = useState("");
     const [stock, setStock] = useState("");
-    const [imagenUrl, setImagenUrl] = useState("");
-
+    const [imagenes, setImagenes] = useState([]); // ✅ soporte múltiples imágenes
+    const [subiendo, setSubiendo] = useState(false);
     const [productos, setProductos] = useState([]);
     const [compras, setCompras] = useState([]);
+
+    const [loadingCompras, setLoadingCompras] = useState(false);
+    const [loadingProductos, setLoadingProductos] = useState(false);
 
     // ================================
     // WebSocket (Socket.IO)
@@ -27,21 +30,7 @@ export default function AdminPanel() {
             console.log("🟢 Conectado a WebSocket:", socket.id);
         });
 
-        // 🔥 Escuchar cambios de stock
-        socket.on("stockActualizado", (data) => {
-            setProductos((prev) =>
-                prev.map((prod) =>
-                    prod.id === data.productoId
-                        ? { ...prod, stock: data.nuevoStock }
-                        : prod
-                )
-            );
-        });
-
-        // 🔥 Escuchar cambios de estado de envío
         socket.on("estadoEnvioActualizado", (data) => {
-            console.log("📦 Estado de envío actualizado en tiempo real:", data);
-
             setCompras((prev) =>
                 prev.map((c) => ({
                     ...c,
@@ -54,82 +43,75 @@ export default function AdminPanel() {
             );
         });
 
-        return () => {
-            socket.disconnect();
-        };
+        // 🆕 Actualización en tiempo real del pago
+        socket.on("estadoPagoActualizado", (data) => {
+            setCompras((prev) =>
+                prev.map((c) =>
+                    c.compra_id === Number(data.compraId)
+                        ? { ...c, estado_pago: data.estado_pago }
+                        : c
+                )
+            );
+        });
+
+        socket.on("nuevaCompra", () => {
+            setLoadingCompras(true);
+            fetchCompras().finally(() => setLoadingCompras(false));
+        });
+
+        socket.on("compraFinalizada", (data) => {
+            setCompras((prev) => prev.filter((c) => c.compra_id !== data.compraId));
+        });
+
+        return () => socket.disconnect();
     }, []);
 
     // ================================
-    // Obtener productos del admin
+    // Obtener productos
     // ================================
     useEffect(() => {
         const fetchProductos = async () => {
+            setLoadingProductos(true);
             try {
                 const { data } = await api.get("/productos-auth");
                 setProductos(data);
             } catch (err) {
                 console.error("❌ Error al cargar productos del admin:", err);
+            } finally {
+                setLoadingProductos(false);
             }
         };
         if (user?.id) fetchProductos();
     }, [user?.id]);
 
     // ================================
-    // Obtener compras (órdenes de usuarios)
+    // Obtener compras
     // ================================
     const fetchCompras = async () => {
+        setLoadingCompras(true);
         try {
-            const { data } = await api.get("/compras"); // 👈 usamos api, no fetch
+            const { data } = await api.get("/compras");
 
-            // 🔑 Filtrar solo órdenes con productos del admin actual
             const filtradas = data
                 .map((c) => ({
                     ...c,
-                    productos: c.productos.filter((p) => p.vendedor_id === user.id),
+                    productos: c.productos.filter(
+                        (p) => p.vendedor_id === user.id && p.estado_envio !== "Entregado"
+                    ),
                 }))
                 .filter((c) => c.productos.length > 0);
 
             setCompras(filtradas);
         } catch (err) {
             console.error("❌ Error al obtener compras:", err);
+        } finally {
+            setLoadingCompras(false);
         }
     };
 
     useEffect(() => {
         if (user?.id) fetchCompras();
     }, [user?.id]);
-
-    // ================================
-    // Crear producto
-    // ================================
-    const crearProducto = async (e) => {
-        e.preventDefault();
-        try {
-            const { data } = await api.post("/productos-auth", {
-                nombre,
-                descripcion,
-                precio,
-                stock,
-                imagen_url: imagenUrl,
-            });
-
-            toast.fire({ icon: "success", title: "✅ Producto creado correctamente" });
-
-            // 🔥 data ya viene con todos los campos (id, nombre, descripcion, precio, stock, etc.)
-            setProductos((prev) => [...prev, data]);
-
-            // limpiar inputs
-            setNombre("");
-            setDescripcion("");
-            setPrecio("");
-            setStock("");
-            setImagenUrl("");
-        } catch (err) {
-            console.error(err);
-            toast.fire({ icon: "error", title: "❌ Error al crear producto" });
-        }
-    };
-
 
     // ================================
     // Eliminar producto
@@ -156,21 +138,117 @@ export default function AdminPanel() {
                 estado_envio: nuevoEstado,
             });
             toast.fire({ icon: "success", title: "✅ Estado de envío actualizado" });
-            fetchCompras();
+
+            if (nuevoEstado === "Entregado") {
+                setCompras((prev) =>
+                    prev
+                        .map((c) => ({
+                            ...c,
+                            productos: c.productos.filter(
+                                (p) => p.detalle_id !== detalleId
+                            ),
+                        }))
+                        .filter((c) => c.productos.length > 0)
+                );
+            } else {
+                fetchCompras();
+            }
         } catch (error) {
             console.error("Error actualizando estado de envío:", error);
             toast.fire({ icon: "error", title: "❌ No se pudo actualizar" });
         }
     };
 
+    // ================================
+    // Subir imágenes múltiples
+    // ================================
+    const uploadImages = async (files) => {
+        setSubiendo(true);
+        try {
+            const urls = [];
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", uploadPreset);
+
+                const res = await fetch(
+                    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                    { method: "POST", body: formData }
+                );
+                const data = await res.json();
+                urls.push(data.secure_url);
+            }
+            setImagenes((prev) => [...prev, ...urls]);
+            toast.fire({ icon: "success", title: "✅ Imagen(es) subida(s) correctamente" });
+        } catch (err) {
+            console.error("❌ Error subiendo imágenes:", err);
+            toast.fire({ icon: "error", title: "❌ No se pudieron subir las imágenes" });
+        } finally {
+            setSubiendo(false);
+        }
+    };
+
+    // ================================
+    // Crear producto
+    // ================================
+    const crearProducto = async (e) => {
+        e.preventDefault();
+
+        if (!nombre || !descripcion || !precio || !stock) {
+            toast.fire({ icon: "warning", title: "⚠️ Completa todos los campos" });
+            return;
+        }
+        if (Number(stock) <= 0) {
+            toast.fire({ icon: "error", title: "❌ El stock debe ser mayor" });
+            return;
+        }
+        if (imagenes.length === 0) {
+            toast.fire({ icon: "warning", title: "⚠️ Debes subir al menos una imagen" });
+            return;
+        }
+        if (subiendo) {
+            toast.fire({ icon: "info", title: "⏳ Espera a que las imágenes terminen de subir" });
+            return;
+        }
+
+        setLoadingProductos(true);
+
+        try {
+            const { data } = await api.post("/productos-auth", {
+                nombre,
+                descripcion,
+                precio,
+                stock,
+                imagenes, // ✅ array de imágenes
+            });
+
+            toast.fire({ icon: "success", title: "✅ Producto creado correctamente" });
+            setProductos((prev) => [...prev, data]);
+
+            // Reset
+            setNombre("");
+            setDescripcion("");
+            setPrecio("");
+            setStock("");
+            setImagenes([]);
+        } catch (err) {
+            console.error("❌ Error creando producto:", err);
+            toast.fire({ icon: "error", title: "❌ Error al crear producto" });
+        } finally {
+            setLoadingProductos(false);
+        }
+    };
+
     return (
         <div className="admin-layout">
-            {/* =======================
-                Aside izquierdo: Órdenes
-            ======================= */}
+            {/* Aside izquierdo */}
             <aside className="admin-orders">
                 <h3>Ordenes de usuarios</h3>
-                {compras.length > 0 ? (
+                {loadingCompras ? (
+                    <div className="aside-loader">
+                        <div className="spinner"></div>
+                    </div>
+                ) : compras.length > 0 ? (
                     <ul>
                         {compras.map((c) =>
                             c.productos.map((p) => (
@@ -179,10 +257,14 @@ export default function AdminPanel() {
                                     <p><strong>Ciudad:</strong> {c.ciudad}</p>
                                     <p><strong>Dirección:</strong> {c.direccion}</p>
                                     <p><strong>Producto:</strong> {p.nombre}</p>
+                                    <p><strong>Teléfono:</strong> {c.telefono}</p>
+                                    <p><strong>Fecha compra: </strong>{c.fecha_compra}</p>
                                     <p><strong>Cantidad:</strong> {p.cantidad}</p>
-                                    <p><strong>Total:</strong> 💲{p.precio_unitario * p.cantidad}</p>
+                                    <p><strong>Total:</strong> 💲 {Number(p.precio_unitario * p.cantidad).toLocaleString("es-CO", {
+                                        style: "currency",
+                                        currency: "COP",
+                                    })}</p>
                                     <p><strong>Estado de pago:</strong> {c.estado_pago}</p>
-
                                     <p><strong>Estado de envío:</strong></p>
                                     <select
                                         value={p.estado_envio || "Pendiente"}
@@ -204,9 +286,7 @@ export default function AdminPanel() {
                 )}
             </aside>
 
-            {/* =======================
-                Centro: Formulario
-            ======================= */}
+            {/* Centro: Formulario */}
             <div className="admin-panel">
                 <h3>Gestión de Productos</h3>
                 <form onSubmit={crearProducto}>
@@ -215,57 +295,103 @@ export default function AdminPanel() {
                         placeholder="Nombre del producto"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
-                        required
                     />
                     <textarea
                         placeholder="Descripción"
                         value={descripcion}
                         onChange={(e) => setDescripcion(e.target.value)}
-                        required
                     />
                     <input
                         type="number"
                         placeholder="Precio"
                         value={precio}
                         onChange={(e) => setPrecio(e.target.value)}
-                        required
                     />
                     <input
                         type="number"
                         placeholder="Stock"
                         value={stock}
                         onChange={(e) => setStock(e.target.value)}
-                        required
                     />
-                    <input
-                        type="text"
-                        placeholder="URL de la imagen"
-                        value={imagenUrl}
-                        onChange={(e) => setImagenUrl(e.target.value)}
-                    />
-                    <button type="submit" className="btn-primary">
-                        Publicar producto
-                    </button>
+
+                    <label className="upload-btn">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            multiple // ✅ varias imágenes
+                            onChange={(e) => {
+                                const files = Array.from(e.target.files);
+                                if (files.length > 0) uploadImages(files);
+                            }}
+                        />
+                        {subiendo ? "⏳ Subiendo..." : "📷 Seleccionar imágenes"}
+                    </label>
+
+                    {(subiendo || imagenes.length > 0) && (
+                        <>
+                            <div className="preview-area">
+                                {subiendo && <div className="spinner"></div>}
+
+                                {imagenes.length > 0 && !subiendo && (
+                                    <div className="preview-multi">
+                                        {imagenes.map((img, idx) => (
+                                            <div className="preview-wrapper" key={idx}>
+                                                <img src={img} alt={`Vista previa ${idx}`} />
+                                                <button
+                                                    type="button"
+                                                    className="btn-remove-image"
+                                                    onClick={() =>
+                                                        setImagenes((prev) =>
+                                                            prev.filter((_, i) => i !== idx)
+                                                        )
+                                                    }
+                                                >
+                                                    ✖
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="container-btn__submit">
+
+                                <button
+                                    type="submit"
+                                    className="btn-primary"
+                                    disabled={subiendo}
+                                >
+                                    {subiendo ? "Cargando..." : "Publicar producto"}
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </form>
             </div>
 
-            {/* =======================
-                Aside derecho: Productos publicados
-            ======================= */}
+            {/* Aside derecho */}
             <aside className="admin-products">
                 <h3>Productos de {user?.nombre}</h3>
-                {productos.length > 0 ? (
+                {loadingProductos ? (
+                    <div className="aside-loader">
+                        <div className="spinner"></div>
+                    </div>
+                ) : productos.length > 0 ? (
                     <ul>
                         {productos.map((p) => (
                             <li key={p.id} className="producto-card">
                                 <div className="producto-info">
                                     <p><strong>{p.nombre}</strong></p>
                                     <p>{p.descripcion}</p>
-                                    <p>💲 {p.precio}</p>
+                                    <p>💲 {Number(p.precio).toLocaleString("es-CO", {
+                                        style: "currency",
+                                        currency: "COP",
+                                    })}</p>
                                     <p>Stock: {p.stock}</p>
-                                    {p.imagen_url && (
-                                        <img src={p.imagen_url} alt={p.nombre} />
-                                    )}
+                                    {/* ✅ múltiples imágenes */}
+                                    {p.imagenes?.map((img, idx) => (
+                                        <img key={idx} src={img} alt={`${p.nombre}-${idx}`} />
+                                    ))}
                                 </div>
                                 <button
                                     className="btn-delete"

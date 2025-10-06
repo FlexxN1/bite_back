@@ -1,34 +1,48 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Flickity from "flickity";
-import "../style/Header.scss"
+import "../style/Header.scss";
 import "flickity/css/flickity.css";
 
-import img from "../assets/img.png";
-import img2 from "../assets/img2.jpg";
-import img3 from "../assets/img3.jpg";
-import img4 from "../assets/img4.jpg";
-import img5 from "../assets/img5.jpg";
-
-const images = [img, img2, img3, img4, img5];
+import errorImg from "../assets/errorImg.jpg"; // 👈 tu imagen fallback
 
 export default function Carousel() {
     const carouselRef = useRef(null);
     const navigate = useNavigate();
-
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const res = await fetch("https://backend-api-production-ece4.up.railway.app/productos/ultimos"); // ⚠️ ajusta al puerto real
+                const data = await res.json();
+
+                // ✅ primera imagen de cada producto o fallback
+                const imgs = data.map(p => p.imagen ? p.imagen : errorImg);
+                setImages(imgs);
+            } catch (err) {
+                console.error("Error al traer últimas imágenes", err);
+                setImages([errorImg]); // fallback si falla todo
+            }
+        };
+
+        fetchImages();
+    }, []);
+
+    useEffect(() => {
+        if (images.length === 0) return;
+
         const flkty = new Flickity(carouselRef.current, {
-            wrapAround: true,   
-            autoPlay: 2000,         
+            wrapAround: true,
+            autoPlay: 2000,
             pauseAutoPlayOnHover: false,
             prevNextButtons: false,
-            pageDots: true,         
+            pageDots: true,
             draggable: true,
         });
 
-        return () => flkty.destroy(); // Limpia instancia al desmontar
-    }, []);
+        return () => flkty.destroy();
+    }, [images]);
 
     const goToProducts = () => {
         navigate("/products");

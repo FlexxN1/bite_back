@@ -1,25 +1,58 @@
 import React, { useContext } from 'react';
 import '../style/OrderItem.scss';
 import iconClose from '../assets/icon_close.png';
-import img_url from '../assets/img.png';
+import img_url from '../assets/errorImg.jpg';
 import AppContext from '@context/AppContext';
 
 const OrderItem = ({ product }) => {
-    const { removeFromCart } = useContext(AppContext);
+    const { removeFromCart, updateCart } = useContext(AppContext);
+
+    const handleCantidadChange = (e) => {
+        const nuevaCantidad = Number(e.target.value);
+        if (nuevaCantidad > 0) {
+            updateCart({ ...product, cantidad: nuevaCantidad });
+        }
+    };
 
     return (
         <div className="OrderItem">
             <figure>
-                <img src={product.imageness_url || img_url} alt={product.nombre} />
+                <img src={product.imagenes_producto[0] || img_url} alt={product.nombre} />
             </figure>
-            <p>{product.nombre}</p>
-            <p>${product.precio}</p>
-            <img className="imgClose"
-                src={iconClose} alt="close"
+
+            <div className="order-info">
+                <p>{product.nombre}</p>
+                <p>
+                    {Number(product.precio).toLocaleString("es-CO", {
+                        style: "currency",
+                        currency: "COP",
+                    })} x {product.cantidad}
+                </p>
+                <strong>
+                    {(Number(product.precio) * (product.cantidad || 1)).toLocaleString("es-CO", {
+                        style: "currency",
+                        currency: "COP",
+                    })}
+                </strong>
+            </div>
+
+            <input
+                type="number"
+                min="1"
+                max={product.stock}
+                value={product.cantidad}
+                onChange={handleCantidadChange}
+                className="input-cantidad-order"
+            />
+
+            <img
+                className="imgClose"
+                src={iconClose}
+                alt="close"
                 onClick={() => removeFromCart(product)}
             />
         </div>
     );
-}
+};
 
 export default OrderItem;

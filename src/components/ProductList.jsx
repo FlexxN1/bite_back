@@ -85,7 +85,7 @@ const ProductList = () => {
                 <>
                     <div className="ProductList">
                         {showSkeleton
-                            ? Array.from({ length: 8 }).map((_, i) => (
+                            ? visibleProducts.map((_, i) => (
                                 <div key={`sk-init-${i}`} className="fade-in">
                                     <SkeletonProduct />
                                 </div>
@@ -101,12 +101,12 @@ const ProductList = () => {
                                 </div>
                             ))}
 
-                        {loadingMore &&
-                            Array.from({ length: 4 }).map((_, i) => (
-                                <div key={`sk-load-${i}`} className="fade-in">
-                                    <SkeletonProduct />
-                                </div>
-                            ))}
+                            {loadingMore &&
+                                Array.from({ length: Math.min(8, products.length - visibleProducts.length) }).map((_, i) => (
+                                    <div key={`sk-load-${i}`} className="">
+                                        <SkeletonProduct />
+                                    </div>
+                                ))}
                     </div>
 
                     {/* loader de scroll infinito */}

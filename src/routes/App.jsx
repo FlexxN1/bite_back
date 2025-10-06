@@ -13,6 +13,7 @@ import Checkout from '../pages/Checkout';
 import AppContext from '@context/AppContext';
 import PrivateRoute from "@components/PrivateRoute";
 import FullLoader from "@components/FullLoader";
+import NotFound from '../pages/NotFound';
 
 
 import "../index.scss";
@@ -37,9 +38,9 @@ export default function App() {
             <Route path="/perfil" element={<PrivateRoute><Perfil /></PrivateRoute>} />
             <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
             <Route path="/products" element={<><Navbar /><Products /></>} />
+            <Route path='*' element={<NotFound />}/>
           </Routes>
         </main>
-        <Footer />
       </div>
     </AppContext.Provider>
   );

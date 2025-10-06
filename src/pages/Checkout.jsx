@@ -1,8 +1,10 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppContext from "@context/AppContext";
+import { toast } from "../utils/toast";
 import "../style/checkout.scss";
 import { API_URL } from "../config";
+import PayPalButton from "../components/payments/PaypalButton";
 
 const Checkout = () => {
     const { state, user } = useContext(AppContext);
@@ -16,6 +18,10 @@ const Checkout = () => {
         metodo_pago: "tarjeta",
     });
 
+    const [loading, setLoading] = useState(false);
+    const [pagoCompleto, setPagoCompleto] = useState(false);
+    const [metodoConfirmado, setMetodoConfirmado] = useState(null);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -24,25 +30,44 @@ const Checkout = () => {
     };
 
     const sumTotal = () => {
-        return state.cart.reduce((acc, item) => acc + Number(item.precio || 0), 0);
+        return state.cart.reduce(
+            (acc, item) => acc + Number(item.precio || 0) * Number(item.cantidad || 1),
+            0
+        );
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (state.cart.length === 0) {
-            alert("⚠️ No puedes realizar una compra sin productos en el carrito.");
+            toast.fire({
+                icon: "warning",
+                title: "⚠️ No puedes realizar una compra sin productos en el carrito.",
+            });
             return;
         }
 
-        // 🔑 Definir estado_pago según el método de pago
-        let estadoPagoInicial = "pendiente";
-
-        if (formData.metodoPago === "contraentrega") {
-            estadoPagoInicial = "pendiente"; // admin lo marca después
-        } else {
-            estadoPagoInicial = "pagado"; // simulamos confirmación inmediata
+        // ✅ PayPal requiere confirmación del pago primero
+        if (formData.metodo_pago === "paypal" && !pagoCompleto) {
+            toast.fire({
+                icon: "info",
+                title: "💳 Debes completar el pago con PayPal antes de confirmar.",
+            });
+            return;
         }
+
+        // ✅ PayPal ya pagado: solo redirige
+        if (formData.metodo_pago === "paypal" && pagoCompleto) {
+            toast.fire({
+                icon: "success",
+                title: "✅ Compra confirmada. Redirigiendo al perfil...",
+            });
+            navigate("/perfil");
+            return;
+        }
+
+        // 🔹 Otros métodos (tarjeta, nequi, bancolombia → pagado / contraentrega → pendiente)
+        setLoading(true);
 
         const order = {
             usuario_id: user?.id || 1,
@@ -50,9 +75,10 @@ const Checkout = () => {
             ciudad: formData.ciudad,
             direccion: formData.direccion,
             telefono: formData.telefono,
-            estado_pago: estadoPagoInicial, // 👈 ahora se guarda en estado_pago
-            estado_envio: "Pendiente", // 👈 siempre inicia en Pendiente
-            metodo_pago: formData.metodo_pago,
+            estado_pago:
+                formData.metodo_pago === "contraentrega" ? "pendiente" : "pagado",
+            estado_envio: "Pendiente",
+            metodo_pago: metodoConfirmado || formData.metodo_pago,
             productos: state.cart,
         };
 
@@ -61,34 +87,37 @@ const Checkout = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`, // 🔑 token
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                 },
                 body: JSON.stringify(order),
             });
 
+            if (!res.ok) throw new Error("Error al registrar compra");
+            await res.json();
 
-            if (!res.ok) throw new Error("Error en la compra");
-
-            const data = await res.json();
-            console.log("Compra registrada:", data);
-
-            alert(`✅ Compra realizada con éxito!\nTotal: ${sumTotal().toLocaleString("es-CO", {
-                style: "currency",
-                currency: "COP",
-            })}`);
+            toast.fire({
+                icon: "success",
+                title: `✅ Compra registrada con ${formData.metodo_pago}`,
+            });
 
             navigate("/perfil");
         } catch (error) {
             console.error("Error en checkout:", error);
-            alert("❌ Hubo un problema con la compra.");
+            toast.fire({
+                icon: "error",
+                title: "❌ Hubo un problema al procesar tu compra.",
+            });
+        } finally {
+            setLoading(false);
         }
     };
+
+
 
     return (
         <section className="checkout-page">
             <h1>Finalizar Compra</h1>
 
-            {/* Resumen de productos */}
             <div className="checkout-summary">
                 <h2>Resumen de la compra</h2>
                 {state.cart.length === 0 ? (
@@ -97,9 +126,13 @@ const Checkout = () => {
                     <>
                         {state.cart.map((item) => (
                             <div key={item.id} className="checkout-item">
-                                <span>{item.nombre}</span>
                                 <span>
-                                    {Number(item.precio).toLocaleString("es-CO", {
+                                    {item.nombre} <strong>x {item.cantidad || 1}</strong>
+                                </span>
+                                <span>
+                                    {(
+                                        Number(item.precio) * Number(item.cantidad || 1)
+                                    ).toLocaleString("es-CO", {
                                         style: "currency",
                                         currency: "COP",
                                     })}
@@ -119,7 +152,6 @@ const Checkout = () => {
                 )}
             </div>
 
-            {/* Formulario */}
             <form className="checkout-form" onSubmit={handleSubmit}>
                 <label>
                     Nombre:
@@ -173,20 +205,44 @@ const Checkout = () => {
                         onChange={handleChange}
                     >
                         <option value="tarjeta">Tarjeta de crédito</option>
-                        <option value="debito">Tarjeta débito</option>
-                        <option value="contraentrega">Pago contra entrega</option>
+                        <option value="paypal">PayPal</option>
                         <option value="nequi">Nequi / Daviplata</option>
+                        <option value="bancolombia">Bancolombia Transferencia</option>
+                        <option value="contraentrega">Pago contra entrega</option>
                     </select>
                 </label>
 
-                {/* 👇 Botón bloqueado si no hay productos */}
+                {formData.metodo_pago === "paypal" && (
+                    <div className="payment-method-section">
+                        <PayPalButton
+                            total={sumTotal()}
+                            formData={formData}
+                            cart={state.cart}
+                            user={user}
+                            onPagoCompletado={(metodo) => {
+                                setPagoCompleto(true);
+                                setMetodoConfirmado(metodo);
+                                toast.fire({
+                                    icon: "success",
+                                    title: `✅ Pago completado con ${metodo}. Ahora confirma la compra.`,
+                                });
+                            }}
+                        />
+                    </div>
+                )}
+
                 <button
                     type="submit"
                     className="btn-primary"
-                    disabled={state.cart.length === 0}
+                    disabled={
+                        state.cart.length === 0 ||
+                        loading ||
+                        (formData.metodo_pago === "paypal" && !pagoCompleto)
+                    }
                 >
-                    Confirmar Compra
+                    {loading ? "Procesando..." : "Confirmar Compra"}
                 </button>
+
                 <button
                     type="button"
                     className="btn-secondary"

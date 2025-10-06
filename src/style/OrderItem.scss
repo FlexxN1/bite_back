@@ -1,20 +1,32 @@
 .OrderItem {
+    background: #eae6e6;
     display: grid;
     grid-template-columns: auto 1fr auto auto;
     gap: 16px;
     margin-right: 5px;
+    padding: 0 20px 0 0;
     margin-bottom: 24px;
     align-items: center;
+    height: 110px;
 }
 
 .OrderItem figure {
     margin: 0;
 }
 
+.imgClose {
+filter: invert(100%) sepia(1%) saturate(15%) hue-rotate(315deg) brightness(100%) contrast(100%);
+}
+
 .OrderItem figure img {
     width: 70px;
-    height: 70px;
-    border-radius: 20px;
+    height: 90px;
+-webkit-border-top-right-radius: 20px;
+    -webkit-border-bottom-right-radius: 20px;
+    -moz-border-radius-topright: 20px;
+    -moz-border-radius-bottomright: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
     object-fit: cover;
 }
 
@@ -25,7 +37,7 @@
 }
 
 .OrderItem p:nth-child(2) {
-    color: #C7C7C7;
+    color:#6a6767;
 }
 
 .OrderItem p:nth-child(3) {

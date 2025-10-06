@@ -1,6 +1,5 @@
--- ======================================
--- Usar base de datos
--- ======================================
+-- ====================================== -- Usar base de datos -- ====================================== USE bhc2g6pxbayk4bkibxfe;
+
 USE bhc2g6pxbayk4bkibxfe;
 
 -- ======================================
@@ -23,31 +22,40 @@ CREATE TABLE IF NOT EXISTS productos (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio DECIMAL(10,2) NOT NULL,
-    imagen_url VARCHAR(255), 
     stock INT DEFAULT 0,
-    vendedor_id INT NOT NULL, -- usuario administrador que subió el producto
+    vendedor_id INT NOT NULL,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (vendedor_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- ======================================
--- Tabla de compras (flujo de pago)
+-- Tabla de imágenes de productos (N imágenes por producto)
+-- ======================================
+CREATE TABLE IF NOT EXISTS imagenes_producto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    producto_id INT NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
+);
+
+-- ======================================
+-- Tabla de compras
 -- ======================================
 CREATE TABLE IF NOT EXISTS compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL, -- el cliente que compra
+    usuario_id INT NOT NULL,
     fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(10,2) NOT NULL,
     ciudad VARCHAR(100) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(20),
-    metodo_pago ENUM('tarjeta', 'debito', 'contraentrega', 'nequi') NOT NULL DEFAULT 'tarjeta',
+    metodo_pago ENUM('tarjeta', 'debito', 'contraentrega', 'nequi', 'paypal', 'bancolombia') NOT NULL DEFAULT 'tarjeta',
     estado_pago ENUM('pendiente', 'pagado', 'cancelado') DEFAULT 'pendiente',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- ======================================
--- Tabla detalle de compras (flujo logístico por producto)
+-- Tabla detalle de compras
 -- ======================================
 CREATE TABLE IF NOT EXISTS detalle_compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,29 +67,3 @@ CREATE TABLE IF NOT EXISTS detalle_compras (
     FOREIGN KEY (compra_id) REFERENCES compras(id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
 );
-
--- ======================================
--- Datos de prueba
--- ======================================
-
--- Usuarios
-INSERT INTO usuarios (nombre, email, password, tipo_usuario)
-VALUES
-('Juan Pérez', 'juan@example.com', '12345', 'Cliente'),
-('Ana Torres', 'ana@example.com', 'clave123', 'Cliente'),
-('Admin1', 'admin1@example.com', 'adminpass', 'Administrador'),
-('Admin2', 'admin2@example.com', 'pass456', 'Administrador');
-
--- Productos
-INSERT INTO productos (nombre, descripcion, precio, stock, vendedor_id, imagen_url)
-VALUES
-('Aguacate Hass', 'Aguacate fresco de exportación', 5000, 100, 3, 'https://example.com/imagenes/aguacate_hass.jpg'),
-('Aguacate Criollo', 'Pequeño pero muy sabroso', 3500, 50, 4, 'https://example.com/imagenes/aguacate_criollo.jpg');
-
--- Ejemplo de compra
-INSERT INTO compras (usuario_id, total, ciudad, direccion, telefono, estado_pago)
-VALUES (1, 20000, 'Bogotá', 'Calle 123 #45-67', '3001234567', 'pendiente');
-
--- Detalle de la compra con estado_envio
-INSERT INTO detalle_compras (compra_id, producto_id, cantidad, precio_unitario, estado_envio)
-VALUES (1, 2, 3, 3500, 'Pendiente');
