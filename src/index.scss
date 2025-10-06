@@ -10,3 +10,17 @@ body {
   font-family: 'Quicksand', sans-serif;
   flex-flow: column;
 }
+html, body {
+  width: 100%;
+  overflow-x: hidden; 
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.wrapper, .container, .main-container {
+  max-width: 100%;
+}

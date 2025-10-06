@@ -72,3 +72,16 @@ nav a:hover {
         margin: 5px 10px;
     }
 }
+
+/* === Mobile overrides for very small screens (≤ 400px) === */
+@media (max-width: 400px) {
+  .header {
+    height: auto;
+    min-height: 64px;
+    padding: 8px;
+  }
+  nav a {
+    margin: 4px 6px;
+    font-size: 0.95rem;
+  }
+}
