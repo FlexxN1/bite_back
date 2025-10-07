@@ -131,3 +131,15 @@
         width: 70px;
     }
 }
+/* === Mobile overrides for very small screens (≤ 400px) === */
+@media (max-width: 400px) {
+  .ProductItem {
+    width: 100%;
+    height: auto;
+    margin-top: 24px;
+  }
+  .image-wrapper {
+    height: auto;
+    aspect-ratio: 4 / 3; /* mantiene proporción sin forzar altura fija */
+  }
+}

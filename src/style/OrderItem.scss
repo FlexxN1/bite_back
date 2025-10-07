@@ -44,3 +44,17 @@ filter: invert(100%) sepia(1%) saturate(15%) hue-rotate(315deg) brightness(100%)
     font-size: 16px;
     font-weight: bold;
 }
+
+@media (max-width: 400px) {
+  .OrderItem {
+    grid-template-columns: 60px 1fr auto;
+    gap: 12px;
+    height: auto;
+    padding-right: 10px;
+  }
+  .OrderItem figure img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+}

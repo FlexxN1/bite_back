@@ -64,3 +64,13 @@
     margin-top: 0;
     margin-bottom: 36px;
 }
+
+@media (max-width: 400px) {
+  .carousel-wrapper__info {
+    height: 240px;
+  }
+  .ProductInfo p:nth-child(2),
+  .ProductInfo p:nth-child(3) {
+    font-size: 14px;
+  }
+}
